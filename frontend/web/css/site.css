@@ -1,0 +1,272 @@
+html,
+body {
+	height: 100%;
+}
+body, body *{
+	font-family: 'Roboto', sans-serif;
+}
+
+.wrap {
+	min-height: 100%;
+	height: auto;
+	margin: 0 auto -60px;
+	padding: 0 0 60px;
+}
+
+.wrap > .container {
+	padding: 70px 15px 20px;
+}
+
+.footer {
+	height: 60px;
+	background-color: #f5f5f5;
+	border-top: 1px solid #ddd;
+	padding-top: 20px;
+}
+
+.jumbotron {
+	text-align: center;
+	background-color: transparent;
+}
+
+.jumbotron .btn {
+	font-size: 21px;
+	padding: 14px 24px;
+}
+
+.not-set {
+	color: #c55;
+	font-style: italic;
+}
+
+/* add sorting icons to gridview sort links */
+a.asc:after, a.desc:after {
+	position: relative;
+	top: 1px;
+	display: inline-block;
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	padding-left: 5px;
+}
+
+a.asc:after {
+	content: /*"\e113"*/ "\e151";
+}
+
+a.desc:after {
+	content: /*"\e114"*/ "\e152";
+}
+
+.sort-numerical a.asc:after {
+	content: "\e153";
+}
+
+.sort-numerical a.desc:after {
+	content: "\e154";
+}
+
+.sort-ordinal a.asc:after {
+	content: "\e155";
+}
+
+.sort-ordinal a.desc:after {
+	content: "\e156";
+}
+
+.grid-view th {
+	white-space: nowrap;
+}
+
+.hint-block {
+	display: block;
+	margin-top: 5px;
+	color: #999;
+}
+
+.error-summary {
+	color: #a94442;
+	background: #fdf7f7;
+	border-left: 3px solid #eed3d7;
+	padding: 10px 20px;
+	margin: 0 0 15px 0;
+}
+
+.user-panel{
+	padding: 3px 0;
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+}
+.user-panel b{
+	margin: 0 10px;
+	display: inline-block;
+}
+.user-panel a{
+	color: #3c763d;
+}
+span.rating{
+	display: inline-block;
+	padding-top: 3px;
+}
+.btn{
+	border-radius: 0;
+}
+.btn-small{
+	padding: 3px 15px;
+}
+.right-row{
+	text-align: right;
+}
+h2{
+	margin: 10px 0;
+}
+.modal.fade .modal-dialog .modal-content, .panel, .panel-heading{
+	border-radius: 0;
+}
+.main-panel.panel .panel-heading{
+	font-size: 16px;
+}
+.success-holder{
+	display: none;
+
+	padding: 5px 10px;
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+	font-weight: bold;
+}
+.submit-row{
+	text-align: center;
+	margin: 10px 0;
+}
+.form-control{
+	border-radius: 0;
+}
+.img-holder, .info-holder{
+	float: left;
+}
+.info-holder{
+	padding-left: 10px;
+}
+.info-holder .name{
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+.action-col a{
+	display: block;
+}
+.deck-col, .date-col, .action-col{
+	vertical-align: middle !important;
+	text-align: center;
+}
+.player-block .c-holder{
+	display: inline-block;
+}
+.player-block .c-holder > *{
+	float: left;
+}
+.m-point-info{
+	margin-right: 10px;
+	padding: 29px 0 0 0;
+}
+.m-point{
+	width: 11px;
+	height: 80px;
+	margin-right: 8px;
+	display: inline-block;
+}
+.m-point span{
+	display: block;
+	background-color: #77CAF3;
+}
+.health{
+	padding: 54px 0 0 5px;
+}
+.health span{
+	padding: 7px;
+	background-color: #dff0d8;
+	border: 1px solid #d6e9c6;
+	color: #234E25;
+}
+
+.game-field.empty{
+	padding: 30px;
+	text-align: center;
+	font-size: 24px;
+}
+.card-list, .card-row{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.card-list li, .card-row li{
+	margin-right: 10px;
+	border: 1px solid #0088e4;
+	background-color: #ccc;
+	width: 60px;
+	height: 80px;
+	float: left;
+}
+.card-list li img, .card-row li img{
+	max-width: 100%;
+}
+.card-row li{
+	display: inline-block;
+	float: none;
+}
+.card-list li div{
+	position: relative;
+}
+.card-list li div span{
+	position: absolute;
+	top: 0;
+	left: 0;
+	text-align: center;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	color: #fff;
+	background-color: rgba(51, 122, 183, 0.66);
+}
+.card-list li.empty{
+	text-align: center;
+	padding-top: 8px;
+}
+.card-list li.empty > span{
+	font-size: 42px;
+	color: #807C7C;
+}
+.player-block .c-holder .health{
+	position: relative;
+}
+.player-block .c-holder .health .message{
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 6px;
+	padding: 5px;
+	text-align: center;
+	min-width: 205px;
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
+.chat .holder{
+	border: 1px solid #bce8f1;
+	padding: 5px;
+	height: 400px;
+}
+.chat p{
+	font-size: 12px;
+	margin-bottom: 7px;
+}
+.c-row .input-group-addon{
+	padding: 0;
+	border: 0;
+}
+.error-msg{
+	color: red;
+	font-weight: bold;
+}
