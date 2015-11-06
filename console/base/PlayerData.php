@@ -60,11 +60,21 @@ class PlayerData extends \common\base\PlayerData{
 			$response['newCards'][] = array_merge($card->getAttributes(), [
 				'id' => $index
 			]);
-			$this->cards[$index] = $card;
+			$this->cards[] = $card;
 			$index++;
 		}
 		$this->newCards = [];
+		array_walk($response['cards'], [$this, 'prepareCard']);
 
 		return $response;
+	}
+
+	/**
+	 * Prepare card for response
+	 * @param $card
+	 * @param $key
+	 */
+	protected function prepareCard(&$card, $key) {
+		$card['id'] = $key;
 	}
 }

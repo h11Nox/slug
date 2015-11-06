@@ -6,7 +6,7 @@ namespace common\base;
  */
 class PlayerData{
 
-	protected $points = 1;
+	protected $points = 10;
 
 	/**
 	 * Get current user health
@@ -21,7 +21,7 @@ class PlayerData{
 	 * @return int
 	 */
 	public function getMaxPoint() {
-		return 1;
+		return 10;
 	}
 
 	/**

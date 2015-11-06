@@ -10,7 +10,7 @@ use yii\helpers\Html;
 	<div class="row">
 		<div class="col-md-7">
 			<ul class="card-list">
-			<?php for($i = 1; $i <= $game->getSettings()->maxCards; $i++){ ?>
+			<?php for ($i = 1; $i <= $game->getSettings()->maxCards; $i++) { ?>
 				<li class="empty">
 					<span>
 						<?php echo $i; ?>
@@ -22,7 +22,9 @@ use yii\helpers\Html;
 		<div class="col-md-5">
 			<div class="c-holder">
 				<div class="m-point-info">
-					<span>1</span> /
+					<span>
+						<?php echo $player->data->getPoints(); ?>
+					</span> /
 					<?php echo $player->data->getMaxPoint(); ?>
 				</div>
 				<span class="m-point progress" data-max="10">

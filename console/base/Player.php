@@ -77,7 +77,7 @@ class Player extends \common\base\Player {
 			$event->player = $this->index;
 			$this->game->trigger('player-use-card', $event);
 
-			// $this->data->useCard($cardID);
+			$this->data->useCard($cardID);
 		}
 	}
 

@@ -381,12 +381,8 @@ cards.prototype = {
 		$.each(cards, function(index, item) {
 			var card = $('<div></div>');
 			$.each({1 : 'cost', 2 : 'type', 3 : 'id'}, function(index, value) {
-				var param = item[value];
-				if (value === 'id') {
-					param += 1;
-				}
-				card.attr('data-'+value, param)
-					.data(value, param);
+				card.attr('data-'+value, item[value])
+					.data(value, item[value]);
 			});
 			card.removeClass(this.emptyClass)
 				.html('<img src="' + item.img + '" /><span>' + item.cost + '</span>');
