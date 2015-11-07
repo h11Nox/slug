@@ -11,14 +11,14 @@ use yii\helpers\Url;
 /**
  * FightList
  */
-class FightListWidget extends ActionWidget{
+class FightListWidget extends ActionWidget {
 
 	public $action = 'index';
 
 	/**
 	 * @return string
 	 */
-	public function actionIndex(){
+	public function actionIndex() {
 		$query = Fight::find();
 		$fu = FightUser::tableName();
 		$query->join('LEFT JOIN', $fu, $fu.'.fight_id = '.Fight::tableName().'.id AND '.$fu.'.user_id = '.\Yii::$app->user->getIdentity()->cid);
@@ -34,7 +34,7 @@ class FightListWidget extends ActionWidget{
 	/**
 	 * @return string
 	 */
-	public function actionCreate(){
+	public function actionCreate() {
 		$data = $this->setAjaxData(new FightForm(), 'create');
 		$response = $data[1];
 
@@ -43,21 +43,20 @@ class FightListWidget extends ActionWidget{
 		return json_encode($response);
 	}
 
-	public function actionStart(){
+	public function actionStart() {
 		$response = [
 			'status' => 0,
 			'message' => '',
 			'redirect' => ''
 		];
 		$fight = Fight::findOne(Yii::$app->request->post('id'));
-		if(!$fight){
+		if (!$fight) {
 			throw new HttpException(404);
 		}
-		if(Fight::STATUS_NEW != $fight->status){
+		if (Fight::STATUS_NEW != $fight->status) {
 			$response['message'] = 'Игра уже началась';
-		}
-		else{
-			if($fight->connect()){
+		} else {
+			if ($fight->connect()) {
 				$response['status'] = 1;
 				$response['redirect'] = $fight->getUrl();
 			}

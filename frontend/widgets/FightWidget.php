@@ -11,7 +11,7 @@ use Yii;
  * Class FightWidget
  * @package frontend\widgets
  */
-class FightWidget extends ActionWidget{
+class FightWidget extends ActionWidget {
 
 	public $fight;
 
@@ -19,7 +19,7 @@ class FightWidget extends ActionWidget{
 	 * Fight Page
 	 * @return string
 	 */
-	public function actionIndex(){
+	public function actionIndex() {
 		$game = new Game();
 
 		$player = new Player();
@@ -27,7 +27,7 @@ class FightWidget extends ActionWidget{
 		$game->setPlayer1($player);
 
 		$owner = Yii::$app->user->getIdentity()->cid == $this->fight->owner->user_id;
-		if(!$owner){
+		if (!$owner) {
 			$player2 = new Player();
 			$player2->initialize($this->fight->user);
 			$game->setPlayer2($player2);
@@ -41,9 +41,9 @@ class FightWidget extends ActionWidget{
 	 * @return string
 	 * @throws HttpException
 	 */
-	public function actionGetUser(){
+	public function actionGetUser() {
 		$fight = Fight::findOne(Yii::$app->request->post('fight'));
-		if(!$fight){
+		if (!$fight) {
 			throw new HttpException(404);
 		}
 		/*if(!$fight->check(Yii::$app->request->post('user'))){
@@ -61,11 +61,11 @@ class FightWidget extends ActionWidget{
 	/**
 	 * @return string
 	 */
-	public function actionCard(){
+	public function actionCard() {
 		return $this->response([]);
 	}
 
-	protected function response($response){
+	protected function response($response) {
 		return json_encode($response);
 	}
 }

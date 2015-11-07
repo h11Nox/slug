@@ -2,14 +2,14 @@
 
 namespace frontend\widgets;
 use yii\base\Model;
+use yii\base\Widget;
 use yii\helpers\Html;
-use yii\web\Response;
 
 /**
  * Виджет с екшинами
  * @author: Nox
  */
-class ActionWidget extends \yii\base\Widget{
+class ActionWidget extends Widget {
 
 	/**
 	 * Действие
@@ -20,9 +20,9 @@ class ActionWidget extends \yii\base\Widget{
 	/**
 	 * Запуск виджета
 	 */
-	public function run(){
+	public function run() {
 		$method = 'action'.$this->action;
-		if(method_exists($this, $method)){
+		if (method_exists($this, $method)) {
 			parent::run();
 			return $this->{$method}();
 		}
@@ -31,16 +31,14 @@ class ActionWidget extends \yii\base\Widget{
 	/**
 	 * @inheritdoc
 	 */
-	public function render($view, $params = [])
-	{
+	public function render($view, $params = []) {
 		return parent::render($this->getViewsPath().'/'.$view, $params);
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function getViewsPath()
-	{
+	protected function getViewsPath() {
 		$parts = explode('\\', $this->className());
 		$widget = array_pop($parts);
 
@@ -55,14 +53,14 @@ class ActionWidget extends \yii\base\Widget{
 	 * @param string $action
 	 * @return array
 	 */
-	public function setAjaxData(Model $model, $action = 'save', $json = false){
+	public function setAjaxData(Model $model, $action = 'save', $json = false) {
 		$response = [
 			'status' => 0,
 			'errors' => '',
 			'text' => ''
 		];
 		if (\Yii::$app->request->isAjax && $model->load(\Yii::$app->request->post())) {
-			if($model->{$action}()){
+			if ($model->{$action}()) {
 				$response['status'] = 1;
 			}
 			else{

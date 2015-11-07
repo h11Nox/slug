@@ -192,7 +192,10 @@ class Game extends \common\base\Game {
 			$p->send([
 				'action' => 'use',
 				'player' => $event->player,
-				'card' => $event->index,
+				'card' => array_merge($event->card->getAttributes(), [
+					'id' => $event->index
+				]),
+				'index' => $event->index,
 				'data' => [
 					$event->player => $this->getPlayer($event->player)->getResponse()
 				]

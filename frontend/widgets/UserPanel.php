@@ -8,14 +8,14 @@ use yii\helpers\Html;
 /**
  * Панель пользователя
  */
-class UserPanel extends Widget{
+class UserPanel extends Widget {
 
 	/**
 	 * @return string
 	 */
-	public function run(){
+	public function run() {
 		$html = '';
-		if(!Yii::$app->user->isGuest){
+		if (!Yii::$app->user->isGuest) {
 			$identity = Yii::$app->user->getIdentity();
 			$img = Html::img($identity->img->getThumb('30x30'), [
 				'alt' => $identity->username,

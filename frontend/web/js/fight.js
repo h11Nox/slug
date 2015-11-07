@@ -304,7 +304,7 @@ player.prototype = {
 
 			fight.lock(true);
 			self.updateData(data);
-			self._cards.use(data.card);
+			self._cards.use(data.index, data.card);
 			fight.lock(false);
 		});
 	},
@@ -433,7 +433,7 @@ cards.prototype = {
 		this.list.off('click', 'li', function(){});
 	},
 	useCard : function($card) {
-		if (this.player.locked) {
+		if (fight.isLocked()) {
 			return false;
 		}
 

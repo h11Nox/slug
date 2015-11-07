@@ -48,7 +48,7 @@ class CardFactory {
 	 * @param int $number
 	 * @return array
 	 */
-	public function get($number = 1){
+	public function get($number = 1) {
 		$data = [];
 		for ($i=1; $i<=$number; $i++) {
 			$this->card++;
@@ -62,7 +62,7 @@ class CardFactory {
 	 * Load cards by id
 	 * @param int $id
 	 */
-	public static function load($id){
+	public static function load($id) {
 		if (!isset(self::$cards[$id])) {
 
 			$card = DeckCard::findOne($id);
@@ -85,8 +85,13 @@ class CardFactory {
 		return self::$cards[$id];
 	}
 
+	/**
+	 * Get card
+	 * @param $c
+	 * @return BoostCard|DamageCard|UnitCard
+	 */
 	protected static function getCard($c) {
-		switch ($c->type){
+		switch ($c->type) {
 			case 1:
 				$card = new UnitCard();
 				break;
