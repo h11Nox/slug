@@ -25,7 +25,9 @@ use yii\helpers\Html;
 					<span>
 						<?php echo $player->data->getPoints(); ?>
 					</span> /
-					<?php echo $player->data->getMaxPoint(); ?>
+					<span>
+						<?php echo $player->data->getMaxPoint(); ?>
+					</span>
 				</div>
 				<span class="m-point progress" data-max="10">
 					<span style="height: 100%;" data-value="10"></span>
@@ -43,6 +45,7 @@ use yii\helpers\Html;
 					<div class="message"></div>
 				</span>
 			</div>
+			<div class="timer">&nbsp;</div>
 		</div>
 	</div>
 </div>

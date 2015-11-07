@@ -152,7 +152,7 @@ var fight = {
 				this.message(data.text);
 				break;
 			case 'use':
-				observer.trigger('player-'+data.player+'-use-card', [ data.card ]);
+				observer.trigger('player-'+data.player+'-use-card', [ data ]);
 				break;
 			 default:
 				break;
@@ -256,12 +256,17 @@ var player = function(options) {
 player.prototype = {
 	block : null,
 	messageBlock : null,
+	timer : null,
 	_cards : {},
 	_row : null,
 	_init : false,
 	init : function() {
 		this.block = $('#player-holder-' + this.index);
+		this.timer = new timer({
+			block : this.block.find('.timer')
+		});
 		this.messageBlock = this.block.find('.message');
+
 		var cardsList = this.block.find('.card-list');
 
 		this._cards = new cards({
@@ -275,6 +280,8 @@ player.prototype = {
 	reInit : function() {
 		this._cards.list = this.block.find('.card-list');
 		this._cards.initItems();
+		this.timer.block = this.block.find('.timer');
+
 		this.initObserver();
 	},
 	initObserver : function() {
@@ -292,13 +299,26 @@ player.prototype = {
 				card : id
 			});
 		});
-		$(document).on('player-' + this.index + '-use-card', function(event, card){
+		$(document).on('player-' + this.index + '-use-card', function(event, data){
 			logger.show('Player ' + self.index + ' used card (server)');
 
 			fight.lock(true);
-			self._cards.use(card);
+			self.updateData(data);
+			self._cards.use(data.card);
 			fight.lock(false);
 		});
+	},
+	updateData : function(response) {
+		var data = response.data[this.index];
+		if (this.mp !== data.mp) {
+			this.mp = data.mp;
+			this.block.find('.m-point > span').css('height', String(data.mp * 100 / data.maxMp) + '%');
+			this.block.find('.m-point-info > span:first').html(this.mp);
+		}
+		if (this.maxMp !== data.maxMp) {
+			this.maxMp = data.maxMp;
+			this.block.find('.m-point-info > span:eq(1)').html(this.maxMp);
+		}
 	},
 	getOpponent : function() {
 		return fight.getPlayerByIndex(this.index == 1 ? 2 : 1);
@@ -310,7 +330,9 @@ player.prototype = {
 		if (this.isCurrent() && !this.active) {
 			this.getOpponent().setNoActive();
 
+			this.block.addClass('active');
 			this.active = true;
+			this.timer.start();
 			this._cards.onEvents();
 		}
 	},
@@ -462,6 +484,50 @@ cards.prototype = {
 				this.clearRow(this.items.eq(i));
 			}
 		}
+	}
+};
+
+var timer = function(options) {
+	if(typeof options == 'undefined'){
+		options = {};
+	}
+	var defaultOptions = {
+		block : null,
+		time : 0,
+		timePerMove : 60,
+		player : null
+	};
+	options = $.extend(defaultOptions, options);
+	$.extend(this, options);
+
+	// this.init();
+};
+
+timer.prototype = {
+	interval : null,
+	started : false,
+	start : function() {
+		if (this.started) {
+			return false;
+		}
+
+		this.time = this.timePerMove;
+		var self = this;
+		this.interval = setInterval(function(){
+			self.tick();
+		}, 1000);
+	},
+	tick : function() {
+		this.time--;
+		if (this.time === 0) {
+			this.end();
+		} else {
+			this.block.html(this.time);
+		}
+	},
+	end : function() {
+		clearInterval(this.interval);
+		$(document).trigger('player' + this.player.index + '-timeout', []);
 	}
 };
 

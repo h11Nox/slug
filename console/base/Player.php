@@ -71,13 +71,15 @@ class Player extends \common\base\Player {
 	public function useCard($cardID) {
 		$card = $this->data->getCard($cardID);
 		if ($card->cost <= $this->data->getPoints()) {
+			// Use mp
+			$this->data->useCard($cardID);
+
+			// Trigger card usage event
 			$event = new UseCardEvent();
 			$event->card = $card;
 			$event->index = $cardID;
 			$event->player = $this->index;
 			$this->game->trigger('player-use-card', $event);
-
-			$this->data->useCard($cardID);
 		}
 	}
 

@@ -8,6 +8,7 @@ class PlayerData extends \common\base\PlayerData{
 
 	protected $cards = [];
 	protected $newCards = [];
+	protected $hand = [];
 
 	/**
 	 * Add cards to user
@@ -35,7 +36,8 @@ class PlayerData extends \common\base\PlayerData{
 	public function useCard($index) {
 		if (isset($this->cards[$index])) {
 			$this->usePoints($this->cards[$index]->cost);
-			unset($this->cards[$index]);
+			$this->addToHand($this->cards[$index]);
+			// unset($this->cards[$index]);
 		}
 	}
 
@@ -67,6 +69,16 @@ class PlayerData extends \common\base\PlayerData{
 		array_walk($response['cards'], [$this, 'prepareCard']);
 
 		return $response;
+	}
+
+	/**
+	 * @param $card
+	 */
+	protected function addToHand($card) {
+		$this->hand[] = [
+			'card' => $card,
+			'data' => []
+		];
 	}
 
 	/**

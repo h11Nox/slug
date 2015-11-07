@@ -176,10 +176,15 @@ h2{
 	height: 80px;
 	margin-right: 8px;
 	display: inline-block;
+	position: relative;
 }
 .m-point span{
 	display: block;
 	background-color: #77CAF3;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
 }
 .health{
 	padding: 54px 0 0 5px;
@@ -269,4 +274,18 @@ h2{
 .error-msg{
 	color: red;
 	font-weight: bold;
+}
+.player-holder.active .timer{
+	display: inline-block;
+}
+.timer{
+	display: none;
+	width: 100px;
+	height: 45px;
+	position: relative;
+	top: -31px;
+	border: 1px solid black;
+	margin-left: 2px;
+	text-align: center;
+	font-size: 32px;
 }

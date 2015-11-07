@@ -21,7 +21,7 @@ $this->registerJs("
 <div class="row">
     <div class="col-md-9">
         <div id="game-holder">
-            <div id="player-holder-1">
+            <div id="player-holder-1" class="player-holder">
                 <?php
                 echo $this->render('player', ['game' => $game, 'player' => $game->getPlayer1()]);
                 ?>
@@ -32,7 +32,7 @@ $this->registerJs("
                 <span class="point-blk"></span>
             </div>
 
-            <div id="player-holder-2">
+            <div id="player-holder-2" class="player-holder">
                 <?php if(!$owner){
                     echo $this->render('player', ['game' => $game, 'player' => $game->getPlayer2()]);
                 } ?>
