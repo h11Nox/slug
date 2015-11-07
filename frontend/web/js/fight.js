@@ -478,7 +478,8 @@ cards.prototype = {
 
 			started = true;
 			if (card < this.count) {
-				this.items.eq(i).html(cards.eq(card).html()).removeClass(this.emptyClass);
+				this.items.eq(i).html(cards.eq(card).html()).removeClass(this.emptyClass)
+					.find('> div').data('id', i).attr('data-id', i);
 				card++;
 			} else {
 				this.clearRow(this.items.eq(i));

@@ -37,7 +37,10 @@ class PlayerData extends \common\base\PlayerData{
 		if (isset($this->cards[$index])) {
 			$this->usePoints($this->cards[$index]->cost);
 			$this->addToHand($this->cards[$index]);
-			// unset($this->cards[$index]);
+			unset($this->cards[$index]);
+
+			// Reorder all card keys
+			$this->cards = array_values($this->cards);
 		}
 	}
 
