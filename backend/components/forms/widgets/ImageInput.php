@@ -29,6 +29,8 @@ class ImageInput extends InputWidget{
         if($this->model->{$this->attribute} instanceof AttachFileModel && $this->model->{$this->attribute}->isExists()){
             $size = $this->model->{$this->attribute}->getSize();
 
+            $buttonId = Html::getInputId($this->model, $this->attribute);
+
             $content .= '<div class="img">';
             $content .= '<img src="'.$this->model->{$this->attribute}->getThumb('220x160', 2).'" /></div>';
             $content .= '<div class="controls-blk">'.$fileInput;

@@ -193,7 +193,8 @@ class Game extends \common\base\Game {
 				'action' => 'use',
 				'player' => $event->player,
 				'card' => array_merge($event->card->getAttributes(), [
-					'id' => $event->index
+					'id' => $event->index,
+					'text' => $event->card->getHtml()
 				]),
 				'index' => $event->index,
 				'data' => [

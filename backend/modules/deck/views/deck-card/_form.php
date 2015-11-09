@@ -30,7 +30,7 @@ use backend\components\forms\base\ActiveForm;
             <?= $form->field($model, 'type')->dropDownList(\common\models\DeckCard::getTypes()) ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
+            <?= $form->field($model, 'data')->arrayInput() ?>
         </div>
     </div>
 

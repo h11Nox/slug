@@ -263,7 +263,8 @@ player.prototype = {
 	init : function() {
 		this.block = $('#player-holder-' + this.index);
 		this.timer = new timer({
-			block : this.block.find('.timer')
+			block : this.block.find('.timer'),
+			player : this
 		});
 		this.messageBlock = this.block.find('.message');
 
@@ -448,14 +449,14 @@ cards.prototype = {
 	getIndex : function() {
 		return this.player.index;
 	},
-	use : function(card) {
-		var $card = this.items.eq(card);
+	use : function(index, card) {
+		var $card = this.items.eq(index);
 		// Use the card
 		// Decrease MP. MP points will be changed after server response
 		// But it still provides error message about mp points running out
 		this.player.mp -= parseInt($card.find('> div').data('cost'));
 
-		var $c = $card.clone();
+		var $c = $('<li>' + card.text + '</li>');
 		this.row.append($c);
 		this.clearRow($card);
 		this.count--;
