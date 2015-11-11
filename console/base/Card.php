@@ -17,6 +17,38 @@ class Card {
 	private static $attributes = ['id', 'title', 'description', 'cost', 'img', 'type'];
 
 	/**
+	 * Params
+	 * @var array
+	 */
+	protected $params;
+
+	/**
+	 * Getting unknown card property
+	 * @param $attribute
+	 * @return bool
+	 */
+	public function __get($attribute) {
+		if (in_array($attribute, $this->params)) {
+			return $this->{$attribute};
+		} else {
+			return !trigger_error('Card property does not exist');
+		}
+	}
+
+	/**
+	 * Setting unknown card property
+	 * @param $attribute
+	 * @param $value
+	 */
+	public function __set($attribute, $value) {
+		if (in_array($attribute, $this->params)) {
+			$this->{$attribute} = $value;
+		} else {
+			trigger_error('Card property does not exist');
+		}
+	}
+
+	/**
 	 * Set card attributes
 	 * @param array $data
 	 */
@@ -36,6 +68,19 @@ class Card {
 		$data = [];
 		foreach (self::$attributes as $attribute) {
 			$data[$attribute] = $this->{$attribute};
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get card params
+	 * @return array
+	 */
+	public function getParams() {
+		$data = [];
+		foreach ($this->params as $param) {
+			$data[$param] = $this->{$param};
 		}
 
 		return $data;

@@ -9,6 +9,12 @@ use yii\helpers\Html;
 class UnitCard extends Card implements Damageable {
 
 	/**
+	 * Params
+	 * @var array
+	 */
+	protected $params = [ 'damage', 'hp' ];
+
+	/**
 	 * Damage player
 	 * @param Player $player
 	 */

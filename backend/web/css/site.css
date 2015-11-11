@@ -140,3 +140,15 @@ a.desc:after {
 .pagination li{
     display: inline-block;
 }
+#block-deckcard-data input{
+	display: inline-block;
+	width: 200px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+.remove-item.danger{
+	background-color: #dd4b39;
+	color: white;
+	padding: 7px 13px;
+	cursor: pointer;
+}

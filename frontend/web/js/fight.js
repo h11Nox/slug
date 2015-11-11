@@ -513,6 +513,7 @@ timer.prototype = {
 			return false;
 		}
 
+		this.started = true;
 		this.time = this.timePerMove;
 		var self = this;
 		this.interval = setInterval(function(){

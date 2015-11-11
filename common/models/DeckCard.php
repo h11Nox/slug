@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\behaviors\ImageBehavior;
+use common\behaviors\SerializeBehavior;
 use Yii;
 
 /**
@@ -20,76 +21,80 @@ use Yii;
  */
 class DeckCard extends \yii\db\ActiveRecord
 {
-    const TYPE_WARRIOR = 1;
-    const TYPE_DAMAGE = 2;
-    const TYPE_BOOST = 3;
+	const TYPE_WARRIOR = 1;
+	const TYPE_DAMAGE = 2;
+	const TYPE_BOOST = 3;
 
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'cms_deck_card';
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName()
+	{
+		return 'cms_deck_card';
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['title'], 'required'],
-            [['data'], 'string'],
-            [['deck_id', 'type'], 'integer'],
-            [['title', 'description'], 'string', 'max' => 255]
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function rules()
+	{
+		return [
+			[['title'], 'required'],
+			[['data'], 'safe'],
+			[['deck_id', 'type'], 'integer'],
+			[['title', 'description'], 'string', 'max' => 255]
+		];
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            ImageBehavior::className()
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors()
+	{
+		return [
+			ImageBehavior::className(),
+			'serialized' => [
+				'class' => SerializeBehavior::className(),
+				'attributes' => [ 'data' ]
+			]
+		];
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'title' => 'Название',
-            'description' => 'Описание',
-            'img' => 'Изображение',
-            'data' => 'Данные',
-            'deck_id' => 'Колода',
-            'type' => 'Тип',
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels()
+	{
+		return [
+			'id' => 'ID',
+			'title' => 'Название',
+			'description' => 'Описание',
+			'img' => 'Изображение',
+			'data' => 'Данные',
+			'deck_id' => 'Колода',
+			'type' => 'Тип',
+		];
+	}
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDeck()
-    {
-        return $this->hasOne(Deck::className(), ['id' => 'deck_id']);
-    }
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getDeck()
+	{
+		return $this->hasOne(Deck::className(), ['id' => 'deck_id']);
+	}
 
-    public static function getTypes(){
-        return [
-            self::TYPE_WARRIOR => 'Воин',
-            self::TYPE_DAMAGE => 'Урон',
-            self::TYPE_BOOST => 'Усиление'
-        ];
-    }
+	public static function getTypes(){
+		return [
+			self::TYPE_WARRIOR => 'Воин',
+			self::TYPE_DAMAGE => 'Урон',
+			self::TYPE_BOOST => 'Усиление'
+		];
+	}
 
-    public function getTypeTitle(){
-        $types = self::getTypes();
+	public function getTypeTitle(){
+		$types = self::getTypes();
 
-        return $types[$this->type];
-    }
+		return $types[$this->type];
+	}
 }
