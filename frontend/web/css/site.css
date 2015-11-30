@@ -162,7 +162,8 @@ h2{
 	text-align: center;
 }
 .player-block .c-holder{
-	display: inline-block;
+	float: left;
+	width: 190px;
 }
 .player-block .c-holder > *{
 	float: left;
@@ -275,17 +276,31 @@ h2{
 	color: red;
 	font-weight: bold;
 }
+.right-panel{
+	float: left;
+	width: 100px;
+	margin-left: 7px;
+	height: 80px;
+	padding-top: 14px;
+}
 .player-holder.active .timer{
-	display: inline-block;
+	display: block;
 }
 .timer{
 	display: none;
-	width: 100px;
-	height: 45px;
-	position: relative;
-	top: -31px;
+	height: 33px;
 	border: 1px solid black;
-	margin-left: 2px;
 	text-align: center;
-	font-size: 32px;
+	font-size: 28px;
+	line-height: 32px;
+}
+.player-holder.active .end-turn{
+	display: block;
+}
+.end-turn{
+	display: none;
+	margin-bottom: 5px;
+}
+.end-turn a{
+	display: block;
 }

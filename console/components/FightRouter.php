@@ -3,6 +3,7 @@ namespace console\components;
 use common\models\Fight;
 use common\models\FightUser;
 use common\models\User;
+use console\base\GameException;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -171,16 +172,15 @@ class FightRouter {
 	}
 
 	/**
-	 * End user turn
+	 * Ends selected user turn
 	 * @param ConnectionInterface $conn
 	 * @param $data
+	 * @throws GameException When trying end not active player turn
 	 */
-	public function endTurn(ConnectionInterface $conn, $data) {
+	public function endTurnRequest(ConnectionInterface $conn, $data) {
 		$this->manager->log('User ended his turn');
 		$fight = $this->manager->getFight($data->fight);
-		try {
-			$fight->endTurn($data->player);
-		} catch (\Exception $e) {}
+		$fight->endTurn($data->player);
 	}
 
 	/**

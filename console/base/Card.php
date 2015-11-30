@@ -20,7 +20,7 @@ class Card {
 	 * Params
 	 * @var array
 	 */
-	protected $params;
+	protected $params = [];
 
 	/**
 	 * Getting unknown card property
@@ -84,6 +84,18 @@ class Card {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Set card params
+	 * @param $data
+	 */
+	public function setParams($data) {
+		if (!empty($data) && is_array($data)) {
+			foreach ($data as $item) {
+				$this->{$item['key']} = $item['value'];
+			}
+		}
 	}
 
 	/**

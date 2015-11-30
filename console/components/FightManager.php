@@ -89,7 +89,11 @@ class FightManager {
 	public function process(ConnectionInterface $from, $data) {
 		$method = implode('', array_map('ucfirst', explode('-', $data->action))).'Request';
 		if (method_exists($this->router, $method)) {
-			$this->router->{$method}($from, $data);
+			try {
+				$this->router->{$method}($from, $data);
+			} catch (\Exception $e) {
+				$this->log($e->getMessage());
+			}
 		}
 	}
 

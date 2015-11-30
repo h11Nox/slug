@@ -102,6 +102,7 @@ class CardFactory {
 				$card = new BoostCard();
 				break;
 		}
+		$card->setParams($c->getAttributes()['data']);
 
 		return $card;
 	}

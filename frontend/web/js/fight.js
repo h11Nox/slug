@@ -9,6 +9,7 @@ var fight = {
 	player1 : null,
 	player2 : null,
 	locked : false,
+	_freeze : false,
 	_holder : null,
 	_interval : null,
 	_server : null,
@@ -152,7 +153,10 @@ var fight = {
 				this.message(data.text);
 				break;
 			case 'use':
-				observer.trigger('player-'+data.player+'-use-card', [ data ]);
+				observer.trigger('player-' + data.player + '-use-card', [ data ]);
+				break;
+			case 'endTurn':
+				observer.trigger('player-' + data.player + '-end-turn', [data]);
 				break;
 			 default:
 				break;
@@ -231,6 +235,17 @@ var fight = {
 	},
 	isLocked : function() {
 		return this.locked;
+	},
+	freeze : function() {
+		this.lock(true);
+		this._freeze = true;
+	},
+	unfreeze : function() {
+		this.lock(false);
+		this._freeze = false;
+	},
+	isFreeze : function() {
+		return this._freeze;
 	}
 };
 
@@ -276,6 +291,12 @@ player.prototype = {
 			items : cardsList.find('li')
 		});
 
+		var self = this;
+		this.block.on('click', '.end-turn', function () {
+			self.endTurn();
+			return false;
+		});
+
 		this.initObserver();
 	},
 	reInit : function() {
@@ -307,6 +328,13 @@ player.prototype = {
 			self.updateData(data);
 			self._cards.use(data.index, data.card);
 			fight.lock(false);
+		});
+		$(document).on('player-' + this.index + '-end-turn', function(event, data){
+			logger.show('Player ' + self.index + ' ended turn (server)');
+
+			self.updateData(data);
+			self._cards.use(data.index, data.card);
+			fight.unfreeze();
 		});
 	},
 	updateData : function(response) {
@@ -371,10 +399,14 @@ player.prototype = {
 		fight.getServer().send();
 	},
 	endTurn : function() {
-		fight.send({
-			action : 'end-turn',
-			player : this.index
-		});
+		if (this.active) {
+			fight.freeze();
+			fight.send({
+				action : 'end-turn',
+				player : this.index
+			});
+			// fight.unfreeze();
+		}
 	}
 };
 
@@ -528,6 +560,9 @@ timer.prototype = {
 		}, 1000);
 	},
 	tick : function() {
+		if (fight.isFreeze()) {
+			return ;
+		}
 		this.time--;
 		if (this.time === 0) {
 			this.end();

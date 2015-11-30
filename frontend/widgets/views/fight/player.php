@@ -45,7 +45,13 @@ use yii\helpers\Html;
 					<div class="message"></div>
 				</span>
 			</div>
-			<div class="timer">&nbsp;</div>
+
+			<div class="right-panel">
+				<div class="end-turn">
+					<a href="#" class="btn btn-info btn-small">Закончить</a>
+				</div>
+				<div class="timer">&nbsp;</div>
+			</div>
 		</div>
 	</div>
 </div>
