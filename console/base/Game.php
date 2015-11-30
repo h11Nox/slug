@@ -28,6 +28,7 @@ class Game extends \common\base\Game {
 	 */
 	protected function initEvents() {
 		$this->on('player-use-card', [$this, 'useCard']);
+		$this->on('user-message', [$this, 'userMessage']);
 	}
 
 	/**
@@ -109,6 +110,7 @@ class Game extends \common\base\Game {
 		$player->setIsNew(false);
 		$player->initCards();
 		$player->addCards(3);
+		$player->setActive($index == 1);
 
 		$this->{'setPlayer'.($owner ? 1 : 2)}($player);
 	}
@@ -184,6 +186,29 @@ class Game extends \common\base\Game {
 	}
 
 	/**
+	 * End user turn
+	 * @param $index
+	 * @throws GameException
+	 */
+	public function endTurn($index) {
+		$player = null;
+		foreach ($this->getPlayers() as $p) {
+			if ($p->isActive()) {
+				$player = $p;
+				break;
+			}
+		}
+		if (empty($player)) {
+			throw new GameException('Not found active player');
+		}
+		if ($player->getIndex() == $index) {
+			throw new GameException('User is active already');
+		}
+		$player->setActive(false);
+		$this->getOpponent($player->getIndex())->setActive(true);
+	}
+
+	/**
 	 * Use card
 	 * @param $event
 	 */
@@ -197,10 +222,23 @@ class Game extends \common\base\Game {
 					'text' => $event->card->getHtml()
 				]),
 				'index' => $event->index,
+				'params' => $event->card->getParams(),
 				'data' => [
 					$event->player => $this->getPlayer($event->player)->getResponse()
 				]
 			]);
 		}
 	}
+
+	/**
+	 * User message
+	 * @param $event
+	 */
+	protected function userMessage($event) {
+		$cm = \Yii::$app->getFormatter()->asShortSize(memory_get_usage(true));
+		$pm = \Yii::$app->getFormatter()->asShortSize(memory_get_peak_usage(true));
+		$this->manager->log("Current memory: {$cm}; peak memory: {$pm}");
+	}
 }
+
+class GameException extends \Exception{}

@@ -328,13 +328,14 @@ player.prototype = {
 		this._cards.add(data);
 	},
 	setActive : function() {
-		if (this.isCurrent() && !this.active) {
+		if (!this.active) {
 			this.getOpponent().setNoActive();
 
 			this.block.addClass('active');
 			this.active = true;
-			this.timer.start();
 			this._cards.onEvents();
+
+			this.timer.start();
 		}
 	},
 	setNoActive : function() {
@@ -368,6 +369,12 @@ player.prototype = {
 		$.extend(params, data);
 
 		fight.getServer().send();
+	},
+	endTurn : function() {
+		fight.send({
+			action : 'end-turn',
+			player : this.index
+		});
 	}
 };
 
@@ -530,7 +537,8 @@ timer.prototype = {
 	},
 	end : function() {
 		clearInterval(this.interval);
-		$(document).trigger('player' + this.player.index + '-timeout', []);
+		this.player.endTurn();
+		/** observer.trigger('player' + this.player.index + '-timeout', []); */
 	}
 };
 

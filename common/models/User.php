@@ -27,215 +27,217 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    public $profile;
-    public $cid;
+	public $profile;
+	public $cid;
 
-    const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
+	const STATUS_DELETED = 0;
+	const STATUS_ACTIVE = 10;
 
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return '{{%user}}';
-    }
+	protected static $users;
 
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-            [
-                'class' => 'common\behaviors\ImageBehavior'
-            ]
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName()
+	{
+		return '{{%user}}';
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
-        ];
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors()
+	{
+		return [
+			TimestampBehavior::className(),
+			[
+				'class' => 'common\behaviors\ImageBehavior'
+			]
+		];
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function rules()
+	{
+		return [
+			['status', 'default', 'value' => self::STATUS_ACTIVE],
+			['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+		];
+	}
 
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public static function findIdentityByAccessToken($token, $type = null)
+	{
+		throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+	}
 
-    /**
-     * Finds user by password reset token
-     *
-     * @param string $token password reset token
-     * @return static|null
-     */
-    public static function findByPasswordResetToken($token)
-    {
-        if (!static::isPasswordResetTokenValid($token)) {
-            return null;
-        }
+	/**
+	 * Finds user by username
+	 *
+	 * @param string $username
+	 * @return static|null
+	 */
+	public static function findByUsername($username)
+	{
+		return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+	}
 
-        return static::findOne([
-            'password_reset_token' => $token,
-            'status' => self::STATUS_ACTIVE,
-        ]);
-    }
+	/**
+	 * Finds user by password reset token
+	 *
+	 * @param string $token password reset token
+	 * @return static|null
+	 */
+	public static function findByPasswordResetToken($token)
+	{
+		if (!static::isPasswordResetTokenValid($token)) {
+			return null;
+		}
 
-    /**
-     * Finds out if password reset token is valid
-     *
-     * @param string $token password reset token
-     * @return boolean
-     */
-    public static function isPasswordResetTokenValid($token)
-    {
-        if (empty($token)) {
-            return false;
-        }
+		return static::findOne([
+			'password_reset_token' => $token,
+			'status' => self::STATUS_ACTIVE,
+		]);
+	}
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
-        $expire = Yii::$app->params['user.passwordResetTokenExpire'];
-        return $timestamp + $expire >= time();
-    }
+	/**
+	 * Finds out if password reset token is valid
+	 *
+	 * @param string $token password reset token
+	 * @return boolean
+	 */
+	public static function isPasswordResetTokenValid($token)
+	{
+		if (empty($token)) {
+			return false;
+		}
 
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->getPrimaryKey();
-    }
+		$timestamp = (int) substr($token, strrpos($token, '_') + 1);
+		$expire = Yii::$app->params['user.passwordResetTokenExpire'];
+		return $timestamp + $expire >= time();
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function getAuthKey()
-    {
-        return $this->auth_key;
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function getId()
+	{
+		return $this->getPrimaryKey();
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->getAuthKey() === $authKey;
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function getAuthKey()
+	{
+		return $this->auth_key;
+	}
 
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return boolean if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
-    }
+	/**
+	 * @inheritdoc
+	 */
+	public function validateAuthKey($authKey)
+	{
+		return $this->getAuthKey() === $authKey;
+	}
 
-    /**
-     * Generates password hash from password and sets it to the model
-     *
-     * @param string $password
-     */
-    public function setPassword($password)
-    {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
-    }
+	/**
+	 * Validates password
+	 *
+	 * @param string $password password to validate
+	 * @return boolean if password provided is valid for current user
+	 */
+	public function validatePassword($password)
+	{
+		return Yii::$app->security->validatePassword($password, $this->password_hash);
+	}
 
-    /**
-     * Generates "remember me" authentication key
-     */
-    public function generateAuthKey()
-    {
-        $this->auth_key = Yii::$app->security->generateRandomString();
-    }
+	/**
+	 * Generates password hash from password and sets it to the model
+	 *
+	 * @param string $password
+	 */
+	public function setPassword($password)
+	{
+		$this->password_hash = Yii::$app->security->generatePasswordHash($password);
+	}
 
-    /**
-     * Generates new password reset token
-     */
-    public function generatePasswordResetToken()
-    {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
-    }
+	/**
+	 * Generates "remember me" authentication key
+	 */
+	public function generateAuthKey()
+	{
+		$this->auth_key = Yii::$app->security->generateRandomString();
+	}
 
-    /**
-     * Removes password reset token
-     */
-    public function removePasswordResetToken()
-    {
-        $this->password_reset_token = null;
-    }
+	/**
+	 * Generates new password reset token
+	 */
+	public function generatePasswordResetToken()
+	{
+		$this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+	}
 
-    /**
-     * @var array EAuth attributes
-     */
+	/**
+	 * Removes password reset token
+	 */
+	public function removePasswordResetToken()
+	{
+		$this->password_reset_token = null;
+	}
 
-    public static function findIdentity($id) {
-        if (Yii::$app->getSession()->has('user-'.$id)) {
-            return new self(Yii::$app->getSession()->get('user-'.$id));
-        }
-        else {
-            return isset(self::$users[$id]) ? new self(self::$users[$id]) : null;
-        }
-    }
+	/**
+	 * @var array EAuth attributes
+	 */
 
-    /**
-     * @param \nodge\eauth\ServiceBase $service
-     * @return User
-     * @throws ErrorException
-     */
-    public static function findByEAuth($service) {
-        if (!$service->getIsAuthenticated()) {
-            throw new ErrorException('EAuth user should be authenticated before creating identity.');
-        }
+	public static function findIdentity($id) {
+		if (Yii::$app->getSession()->has('user-'.$id)) {
+			return new self(Yii::$app->getSession()->get('user-'.$id));
+		}
+		else {
+			return isset(self::$users[$id]) ? new self(self::$users[$id]) : null;
+		}
+	}
 
-        $user = static::find()->where('service = :service AND service_id = :ID', [
-            ':service' => $service->getServiceName(),
-            ':ID' => $service->getAttribute('id')
-        ])->one();
-        if(!$user){
-            $photo = $service->getServiceName() === 'vkontakte' ?
-                $service->getAttribute('photo_big')
-                : "https://graph.facebook.com/{$service->getAttribute('id')}/picture?type=large";
-            $user = new static([
-                'username' => $service->getAttribute('name'),
-                'service' => $service->getServiceName(),
-                'service_id' => $service->getAttribute('id'),
-                'img' => $photo
-            ]);
-            $user->save();
-        }
+	/**
+	 * @param \nodge\eauth\ServiceBase $service
+	 * @return User
+	 * @throws ErrorException
+	 */
+	public static function findByEAuth($service) {
+		if (!$service->getIsAuthenticated()) {
+			throw new ErrorException('EAuth user should be authenticated before creating identity.');
+		}
 
-        $id = $service->getServiceName().'-'.$service->getId();
-        $attributes = array_merge($user->getAttributes(['id', 'username', 'img', 'rating']), [
-            'id' => $id,
-            // 'username' => $service->getAttribute('name'),
-            'auth_key' => md5($id),
-            'cid' => $user->id
-        ]);
-        Yii::$app->getSession()->set('user-'.$id, $attributes);
-        return new self($attributes);
-    }
+		$user = static::find()->where('service = :service AND service_id = :ID', [
+			':service' => $service->getServiceName(),
+			':ID' => $service->getAttribute('id')
+		])->one();
+		if(!$user){
+			$photo = $service->getServiceName() === 'vkontakte' ?
+				$service->getAttribute('photo_big')
+				: "https://graph.facebook.com/{$service->getAttribute('id')}/picture?type=large";
+			$user = new static([
+				'username' => $service->getAttribute('name'),
+				'service' => $service->getServiceName(),
+				'service_id' => $service->getAttribute('id'),
+				'img' => $photo
+			]);
+			$user->save();
+		}
+
+		$id = $service->getServiceName().'-'.$service->getId();
+		$attributes = array_merge($user->getAttributes(['id', 'username', 'img', 'rating']), [
+			'id' => $id,
+			// 'username' => $service->getAttribute('name'),
+			'auth_key' => md5($id),
+			'cid' => $user->id
+		]);
+		Yii::$app->getSession()->set('user-'.$id, $attributes);
+		return new self($attributes);
+	}
 }

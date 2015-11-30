@@ -168,15 +168,19 @@ class FightRouter {
 		$this->manager->log('User used a card');
 		$fight = $this->manager->getFight($data->fight);
 		$fight->getPlayer($data->index)->useCard($data->card);
+	}
 
-		/*$data = $this->getResponseData($fight);
-		foreach ($fight->getPlayers() as $player) {
-			$player->send([
-				'action' => 'use',
-				'data' => $data
-			]);
-		}
-		unset($fight, $data);*/
+	/**
+	 * End user turn
+	 * @param ConnectionInterface $conn
+	 * @param $data
+	 */
+	public function endTurn(ConnectionInterface $conn, $data) {
+		$this->manager->log('User ended his turn');
+		$fight = $this->manager->getFight($data->fight);
+		try {
+			$fight->endTurn($data->player);
+		} catch (\Exception $e) {}
 	}
 
 	/**

@@ -132,15 +132,25 @@ class Fight extends \yii\db\ActiveRecord
         return Url::toRoute(['site/fight', 'id' => $this->id]);
     }
 
+    /**
+     * Check if fight is new
+     * @return bool
+     */
     public function isNew(){
         return self::STATUS_CONNECTED == $this->status;
     }
 
+    /**
+     * Start fight
+     */
     public function start(){
         $this->shuffle();
         $this->updateAttributes(['status' => self::STATUS_STARTED]);
     }
 
+    /**
+     * Shuffle all
+     */
     public function shuffle(){
         $this->owner->shuffle();
         $this->user->shuffle();

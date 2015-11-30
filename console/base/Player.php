@@ -1,6 +1,8 @@
 <?php
 namespace console\base;
+use backend\models\User;
 use console\base\events\UseCardEvent;
+use console\base\events\UserSendEvent;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -15,12 +17,21 @@ class Player extends \common\base\Player {
 	protected $connection;
 	protected $owner = false;
 	protected $cards;
+	protected $active = false;
 
 	/**
 	 * Constructor
 	 */
 	public function init(){
 		$this->data = $this->getPlayerData();
+	}
+
+	/**
+	 * Get user index
+	 * @return mixed
+	 */
+	public function getIndex() {
+		return $this->index;
 	}
 
 	/**
@@ -102,9 +113,8 @@ class Player extends \common\base\Player {
 
 	/**
 	 * Disconnect
-	 * @param ConnectionInterface $conn
 	 */
-	public function disconnect(ConnectionInterface $conn) {
+	public function disconnect() {
 		$this->connected = false;
 		$this->connection = null;
 	}
@@ -177,6 +187,10 @@ class Player extends \common\base\Player {
 	 */
 	public function send($data) {
 		if ($this->isConnected()) {
+			$event = new UserSendEvent();
+			$event->player = $this;
+			$this->game->trigger('user-message', $event);
+
 			$this->connection->send(json_encode($data));
 		}
 	}
@@ -195,5 +209,21 @@ class Player extends \common\base\Player {
 	 */
 	public function isNew() {
 		return $this->new;
+	}
+
+	/**
+	 * Set if user is active
+	 * @param $active
+	 */
+	public function setActive($active) {
+		$this->active = $active;
+	}
+
+	/**
+	 * Check if user is active now
+	 * @return bool
+	 */
+	public function isActive() {
+		return $this->active;
 	}
 }
