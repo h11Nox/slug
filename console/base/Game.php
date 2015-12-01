@@ -2,6 +2,7 @@
 namespace console\base;
 use common\base\GameSettings;
 use common\models\Fight;
+use console\base\http\Response;
 
 /**
  * Game Class
@@ -206,6 +207,11 @@ class Game extends \common\base\Game {
 		}
 		$player->setActive(false);
 		$this->getOpponent($player->getIndex())->setActive(true);
+
+		$response = (new Response())
+			->setAction('endTurn')
+			->setPlayer($player);
+		$this->send($response);
 	}
 
 	/**
@@ -213,20 +219,19 @@ class Game extends \common\base\Game {
 	 * @param $event
 	 */
 	protected function useCard($event) {
+		$response = (new Response())->setAction('use')
+			->setPlayer($event->player)
+			->setCard($event->card);
+		$this->send($response);
+	}
+
+	/**
+	 * Set response
+	 * @param Response $response
+	 */
+	protected function send(Response $response) {
 		foreach ($this->getPlayers() as $p) {
-			$p->send([
-				'action' => 'use',
-				'player' => $event->player,
-				'card' => array_merge($event->card->getAttributes(), [
-					'id' => $event->index,
-					'text' => $event->card->getHtml()
-				]),
-				'index' => $event->index,
-				'params' => $event->card->getParams(),
-				'data' => [
-					$event->player => $this->getPlayer($event->player)->getResponse()
-				]
-			]);
+			$p->send($response->getResponseData());
 		}
 	}
 

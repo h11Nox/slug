@@ -14,6 +14,8 @@ class Card {
 	public $img;
 	public $type;
 
+	protected $index;
+
 	private static $attributes = ['id', 'title', 'description', 'cost', 'img', 'type'];
 
 	/**
@@ -96,6 +98,24 @@ class Card {
 				$this->{$item['key']} = $item['value'];
 			}
 		}
+	}
+
+	/**
+	 * Set card index
+	 * @param $index
+	 * @return $this
+	 */
+	public function setIndex($index) {
+		$this->index = $index;
+		return $this;
+	}
+
+	/**
+	 * Get index
+	 * @return mixed
+	 */
+	public function getIndex() {
+		return $this->index;
 	}
 
 	/**

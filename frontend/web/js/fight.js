@@ -330,7 +330,7 @@ player.prototype = {
 
 			fight.lock(true);
 			self.updateData(data);
-			self._cards.use(data.index, data.card);
+			self._cards.use(data.card.data.id, data.card.data);
 			fight.lock(false);
 		});
 		$(document).on('player-' + this.index + '-end-turn', function(event, data){

@@ -180,7 +180,7 @@ class FightRouter {
 	public function endTurnRequest(ConnectionInterface $conn, $data) {
 		$this->manager->log('User ended his turn');
 		$fight = $this->manager->getFight($data->fight);
-		$fight->endTurn($data->player);
+		$fight->endTurn((int)$data->player);
 	}
 
 	/**
