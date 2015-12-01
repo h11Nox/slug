@@ -336,8 +336,10 @@ player.prototype = {
 		$(document).on('player-' + this.index + '-end-turn', function(event, data){
 			logger.show('Player ' + self.index + ' ended turn (server)');
 
-			self.updateData(data);
-			self._cards.use(data.index, data.card);
+			if (self.active) {
+				self.timer.destroy();
+				self.getOpponent().setActive();
+			}
 			fight.unfreeze();
 		});
 	},
@@ -581,9 +583,19 @@ timer.prototype = {
 		}
 	},
 	end : function() {
-		clearInterval(this.interval);
+		this.stop();
 		this.player.endTurn();
 		/** observer.trigger('player' + this.player.index + '-timeout', []); */
+	},
+	stop : function() {
+		if (this.interval !== null) {
+			clearInterval(this.interval);
+		}
+	},
+	destroy : function() {
+		this.stop();
+		this.time = this.timePerMove;
+		this.started = false;
 	}
 };
 
