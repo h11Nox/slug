@@ -201,8 +201,8 @@ class Game extends \common\base\Game {
 		if (empty($player)) {
 			throw new GameException('Not found active player');
 		}
-		if ($player->getIndex() == $index) {
-			throw new GameException('User is active already');
+		if ($player->getIndex() !== $index) {
+			throw new GameException('User is not active already');
 		}
 		$player->setActive(false);
 		$this->getOpponent($player->getIndex())->setActive(true);

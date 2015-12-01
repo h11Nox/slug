@@ -92,7 +92,7 @@ class FightManager {
 			try {
 				$this->router->{$method}($from, $data);
 			} catch (\Exception $e) {
-				$this->log($e->getMessage());
+				$this->log("Process problem: {$e->getMessage()}");
 			}
 		}
 	}

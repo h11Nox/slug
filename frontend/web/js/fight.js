@@ -260,7 +260,11 @@ var player = function(options) {
 		hp : 20,
 		mp : 1,
 		maxMp : 1,
-		active : false
+		active : false,
+		cssStyle : {
+			activeClass : 'active',
+			currentClass : 'current'
+		}
 	};
 	options = $.extend(defaultOptions, options);
 	$.extend(this, options);
@@ -359,7 +363,10 @@ player.prototype = {
 		if (!this.active) {
 			this.getOpponent().setNoActive();
 
-			this.block.addClass('active');
+			this.block.addClass(this.cssStyle.activeClass);
+			if (this.isCurrent()) {
+				this.block.addClass(this.cssStyle.currentClass);
+			}
 			this.active = true;
 			this._cards.onEvents();
 
@@ -369,6 +376,9 @@ player.prototype = {
 	setNoActive : function() {
 		if (this.active) {
 			this.active = false;
+
+			this.block.removeClass(this.cssStyle.activeClass)
+				.removeClass(this.cssStyle.currentClass);
 			this._cards.offEvents();
 		}
 	},

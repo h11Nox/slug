@@ -281,10 +281,13 @@ h2{
 	width: 100px;
 	margin-left: 7px;
 	height: 80px;
-	padding-top: 14px;
+	padding-top: 46px;
 }
 .player-holder.active .timer{
 	display: block;
+}
+.player-holder.active.current .right-panel{
+	padding-top: 14px;
 }
 .timer{
 	display: none;
@@ -294,7 +297,7 @@ h2{
 	font-size: 28px;
 	line-height: 32px;
 }
-.player-holder.active .end-turn{
+.player-holder.active.current .end-turn{
 	display: block;
 }
 .end-turn{
