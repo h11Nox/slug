@@ -202,6 +202,12 @@ h2{
 	text-align: center;
 	font-size: 24px;
 }
+.game-field{
+	min-height: 240px;
+}
+.game-field .card-row[data-index="1"]{
+	margin-bottom: 20px;
+}
 .card-list, .card-row{
 	list-style: none;
 	margin: 0;

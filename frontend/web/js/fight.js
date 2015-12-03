@@ -151,6 +151,9 @@ var fight = {
 				break;
 			case 'message':
 				this.message(data.text);
+				if (typeof data.player !== 'undefined') {
+					this.getPlayer(data.player).message(data.text);
+				}
 				break;
 			case 'use':
 				observer.trigger('player-' + data.player + '-use-card', [ data ]);
@@ -178,9 +181,8 @@ var fight = {
 		this.player1.setCardRow($rows.eq(0));
 		this.player2.setCardRow($rows.eq(1));
 
-		var cardField = reconnect ? 'cards' : 'newCards';
-		this.player1.addCards(data.data[1][cardField]);
-		this.player2.addCards(data.data[2][cardField]);
+		this.player1.addCards(data.data[1]['cards']);
+		this.player2.addCards(data.data[2]['cards']);
 
 		this.getPlayerByIndex(data.active).setActive();
 	},
@@ -274,8 +276,8 @@ var player = function(options) {
 
 player.prototype = {
 	block : null,
-	messageBlock : null,
 	timer : null,
+	photo : null,
 	_cards : {},
 	_row : null,
 	_init : false,
@@ -285,7 +287,7 @@ player.prototype = {
 			block : this.block.find('.timer'),
 			player : this
 		});
-		this.messageBlock = this.block.find('.message');
+		this.img = this.block.find('img.player-photo:first');
 
 		var cardsList = this.block.find('.card-list');
 
@@ -301,13 +303,15 @@ player.prototype = {
 			return false;
 		});
 
-		this.initObserver();
+		this.initAll();
 	},
 	reInit : function() {
 		this._cards.list = this.block.find('.card-list');
 		this._cards.initItems();
 		this.timer.block = this.block.find('.timer');
-
+		this.initAll();
+	},
+	initAll : function() {
 		this.initObserver();
 	},
 	initObserver : function() {
@@ -368,10 +372,9 @@ player.prototype = {
 			this.block.addClass(this.cssStyle.activeClass);
 			if (this.isCurrent()) {
 				this.block.addClass(this.cssStyle.currentClass);
+				this._cards.onEvents();
 			}
 			this.active = true;
-			this._cards.onEvents();
-
 			this.timer.start();
 		}
 	},
@@ -394,12 +397,14 @@ player.prototype = {
 		if (typeof type == 'undefined') {
 			type = 'error';
 		}
+
 		var self = this;
-		this.messageBlock.addClass(type).html(m).fadeIn(500, function () {
-			/*setTimeout(function(){
-				self.messageBlock.fadeOut(500).removeClass(type);
-			}, 700);*/
+		this.img.on('show.bs.tooltip', function () {
+			setTimeout(function(){
+				self.img.tooltip('destroy');
+			}, 2000);
 		});
+		this.img.tooltip({title : m, placement : this.index == 1 ? 'bottom' : 'top'}).tooltip('show');
 	},
 	load : function(data, callback) {
 		var params = {
@@ -433,7 +438,8 @@ var cards = function(options) {
 		count : 0,
 		row : null,
 		emptyClass : 'empty',
-		locked : false
+		locked : false,
+		maxCount : 5
 	};
 	options = $.extend(defaultOptions, options);
 	$.extend(this, options);
@@ -509,20 +515,20 @@ cards.prototype = {
 
 		var $c = $('<li>' + card.text + '</li>');
 		this.row.append($c);
-		this.clearRow($card);
+		this.clearRow($card, index + 1);
 		this.count--;
 
 		this.sort();
 	},
-	clearRow : function($row) {
-		$row.html('').addClass(this.emptyClass);
+	clearRow : function($row, index) {
+		$row.html('<span>' + index + '</span>').addClass(this.emptyClass);
 	},
 	sort : function() {
 		var started = false;
 		var card = 0;
 		var cards = this.items.filter(':not(.' + this.emptyClass + ')');
 
-		for (var i=0; i<5; i++) {
+		for (var i=0; i<this.maxCount; i++) {
 			if (!started && !this.items.eq(i).hasClass(this.emptyClass)) {
 				card++;
 				continue;
@@ -534,7 +540,7 @@ cards.prototype = {
 					.find('> div').data('id', i).attr('data-id', i);
 				card++;
 			} else {
-				this.clearRow(this.items.eq(i));
+				this.clearRow(this.items.eq(i), i + 1);
 			}
 		}
 	}

@@ -3,6 +3,7 @@ namespace console\base;
 use backend\models\User;
 use console\base\events\UseCardEvent;
 use console\base\events\UserSendEvent;
+use console\base\http\Response;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -183,15 +184,15 @@ class Player extends \common\base\Player {
 
 	/**
 	 * Send
-	 * @param $data
+	 * @param $response
 	 */
-	public function send($data) {
+	public function send(Response $response) {
 		if ($this->isConnected()) {
 			$event = new UserSendEvent();
 			$event->player = $this;
 			$this->game->trigger('user-message', $event);
 
-			$this->connection->send(json_encode($data));
+			$this->connection->send(json_encode($response->getResponseData()));
 		}
 	}
 

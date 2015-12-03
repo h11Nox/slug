@@ -34,8 +34,9 @@ use yii\helpers\Html;
 				</span>
 				<span class="img">
 					<?php echo Html::img($player->user->img->getThumb('80x80'), [
+						'class' => 'player-photo',
 						'alt' => $player->user->username,
-						'title' => $player->user->username
+						// 'title' => $player->user->username
 					]); ?>
 				</span>
 				<span class="health">

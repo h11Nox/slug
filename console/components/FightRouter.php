@@ -4,6 +4,7 @@ use common\models\Fight;
 use common\models\FightUser;
 use common\models\User;
 use console\base\GameException;
+use console\base\http\Response;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -56,31 +57,27 @@ class FightRouter {
 		// Send message about connecting
 		$player = $fight->getPlayer($data->index);
 		foreach ($fight->getPlayers() as $p) {
-			$p->send([
-				'action' => 'message',
-				'text' => $player->getName().' присоединился к игре'
-			]);
+			$response = (new Response())
+				->setAction('message')
+				->setText($player->getName().' присоединился к игре');
+			$p->send($response);
 		}
 
 		if (!$player->isOwner() && !$isReconnect) {
 			$fight->start();
-			$fight->getOpponent($data->index)->send([
-				'action' => 'connect',
-				'id' => $data->user
-			]);
+			$response = (new Response())
+				->setAction('connect')
+				->setId($data->user);
+			$fight->getOpponent($data->index)->send($response);
 		}
 
 		if ($isReconnect && $fight->isFull()) {
-			// echo 'Sending reconnect request '.PHP_EOL;
-			$player->send([
-				'action' => 'reconnect',
-				'active' => 1,
-				'ids' => [
-					1 => $fight->getPlayer1()->getFightUser()->user_id,
-					2 => $fight->getPlayer2()->getFightUser()->user_id,
-				],
-				'data' => $this->getResponseData($fight)
-			]);
+			$response = (new Response())
+				->setAction('reconnect')
+				->setPlayers($fight->getPlayers())
+				->setFight($fight)
+				->setIds(true);
+			$player->send($response);
 		}
 	}
 
@@ -97,10 +94,10 @@ class FightRouter {
 		// Get disconnected player
 		$player = $this->manager->getFight($data['fight'])->getPlayer($data['index']);
 
-		$player->getOpponent()->send([
-			'action' => 'message',
-			'text' => $player->getName().' отсоединился от игры'
-		]);
+		$response = (new Response())
+			->setAction('message')
+			->setText($player->getName().' отсоединился от игры');
+		$player->getOpponent()->send($response);
 
 		$player->disconnect();
 	}
@@ -123,10 +120,11 @@ class FightRouter {
 	public function messageRequest(ConnectionInterface $from, $data) {
 		$fight = $this->manager->getFight($data->fight);
 		foreach ($fight->getPlayers() as $player) {
-			$player->send([
-				'action' => 'message',
-				'text' => $player->getName().': '.$data->text
-			]);
+			$response = (new Response())
+				->setAction('message')
+				->setPlayer($fight->getPlayer($data->index))
+				->setText($player->getName().': '.$data->text);
+			$player->send($response);
 		}
 	}
 
@@ -144,20 +142,12 @@ class FightRouter {
 				$this->manager->log('Starting new fight');
 				$fight->start();
 			}
-			$data = $this->getResponseData($fight);
-
-			foreach ($fight->getPlayers() as $player) {
-				$player->send([
-					'action' => 'init',
-					'active' => 1,
-					'move' => 1,
-					'data' => $data
-				]);
-			}
-
-			unset($data);
+			$response = (new Response())
+				->setAction('init')
+				->setPlayers($fight->getPlayers())
+				->setFight($fight);
+			$fight->send($response);
 		}
-		unset($fight);
 	}
 
 	/**
@@ -167,8 +157,10 @@ class FightRouter {
 	*/
 	public function useRequest(ConnectionInterface $conn, $data) {
 		$this->manager->log('User used a card');
-		$fight = $this->manager->getFight($data->fight);
-		$fight->getPlayer($data->index)->useCard($data->card);
+		$this->manager
+			->getFight($data->fight)
+			->getPlayer($data->index)
+			->useCard($data->card);
 	}
 
 	/**
@@ -179,8 +171,9 @@ class FightRouter {
 	 */
 	public function endTurnRequest(ConnectionInterface $conn, $data) {
 		$this->manager->log('User ended his turn');
-		$fight = $this->manager->getFight($data->fight);
-		$fight->endTurn((int)$data->player);
+		$this->manager
+			->getFight($data->fight)
+			->endTurn((int)$data->player);
 	}
 
 	/**

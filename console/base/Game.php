@@ -11,6 +11,7 @@ class Game extends \common\base\Game {
 
 	protected $manager;
 	protected $fight;
+	protected $phase;
 	protected $initialized = false;
 
 	/**
@@ -20,8 +21,17 @@ class Game extends \common\base\Game {
 		$this->_settings = new GameSettings();
 		$this->_player1 = new Player();
 		$this->_player2 = new Player();
+		$this->phase = new GamePhase();
 
 		$this->initEvents();
+	}
+
+	/**
+	 * Get game phase
+	 * @return GamePhase
+	 */
+	public function getPhase() {
+		return $this->phase;
 	}
 
 	/**
@@ -192,22 +202,14 @@ class Game extends \common\base\Game {
 	 * @throws GameException
 	 */
 	public function endTurn($index) {
-		$player = null;
-		foreach ($this->getPlayers() as $p) {
-			if ($p->isActive()) {
-				$player = $p;
-				break;
-			}
-		}
-		if (empty($player)) {
-			throw new GameException('Not found active player');
-		}
+		$player = $this->getPlayer($this->phase->getPlayer());
 		if ($player->getIndex() !== $index) {
 			throw new GameException('User is not active already');
 		}
 		$player->setActive(false);
 		$this->getOpponent($player->getIndex())->setActive(true);
 
+		$this->phase->end();
 		$response = (new Response())
 			->setAction('endTurn')
 			->setPlayer($player);
@@ -219,7 +221,8 @@ class Game extends \common\base\Game {
 	 * @param $event
 	 */
 	protected function useCard($event) {
-		$response = (new Response())->setAction('use')
+		$response = (new Response())
+			->setAction('use')
 			->setPlayer($event->player)
 			->setCard($event->card);
 		$this->send($response);
@@ -229,9 +232,10 @@ class Game extends \common\base\Game {
 	 * Set response
 	 * @param Response $response
 	 */
-	protected function send(Response $response) {
+	public function send(Response $response) {
+		$response->setFight($this);
 		foreach ($this->getPlayers() as $p) {
-			$p->send($response->getResponseData());
+			$p->send($response);
 		}
 	}
 

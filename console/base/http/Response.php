@@ -10,9 +10,13 @@ class Response {
 
 	protected $action;
 	protected $player;
-	protected $active;
+	protected $players;
 	protected $card;
+	protected $text;
 	protected $data;
+	protected $game;
+	protected $ids = false;
+	protected $id;
 
 	/**
 	 * Set action
@@ -35,12 +39,12 @@ class Response {
 	}
 
 	/**
-	 * Set active
-	 * @param $active
+	 * Set players
+	 * @param $players
 	 * @return $this
 	 */
-	public function setActive($active) {
-		$this->active = $active;
+	public function setPlayers(array $players) {
+		$this->players = $players;
 		return $this;
 	}
 
@@ -53,31 +57,88 @@ class Response {
 		$this->card = $card;
 		return $this;
 	}
+
+	/**
+	 * Set game
+	 *
+	 * @param $game
+	 * @return $this
+	 */
+	public function setFight($game) {
+		$this->game = $game;
+		return $this;
+	}
+
+	/**
+	 * Set ids
+	 * @param $ids
+	 * @return $this
+	 */
+	public function setIds($ids) {
+		$this->ids = $ids;
+		return $this;
+	}
+
+	/**
+	 * Set text
+	 * @param $text
+	 * @return $this
+	 */
+	public function setText($text) {
+		$this->text = $text;
+		return $this;
+	}
+
+	/**
+	 * Set id
+	 * @param $id
+	 * @return $this
+	 */
+	public function setId($id) {
+		$this->id = $id;
+		return $this;
+	}
+
 	/**
 	 * Get Object data
 	 * @return array
 	 */
 	public function getResponseData() {
-		$data = [
-			'action' => $this->action,
-			'data' => []
-		];
+		$response = new GameResponse();
+		$response->setAction($this->action);
 		if (!empty($this->player)) {
-			$data['player'] = $this->player->getIndex();
-			$data['data'][$this->player->getIndex()] = $this->player->getResponse();
-		}
-		if ($this->active !== null) {
-			$data['active'] = $this->active;
+			$response->setPlayer($this->player->getIndex())
+				->setDataParam($this->player->getIndex(), $this->player->getResponse());
 		}
 		if (!empty($this->card)) {
-			$data['card'] = [
+			$response->setCard([
 				'data' => array_merge($this->card->getAttributes(), [
 					'id' => $this->card->getIndex(),
 					'text' => $this->card->getHtml()
 				]),
 				'params' => $this->card->getParams()
-			];
+			]);
 		}
-		return $data;
+		if (!empty($this->players)) {
+			foreach ($this->players as $p) {
+				$response->setDataParam($p->getIndex(), $p->getResponse());
+			}
+		}
+		if (!empty($this->game)) {
+			$response->setActive($this->game->getPhase()->getPlayer())
+				->setPhase($this->game->getPhase()->getPhase());
+			if ($this->ids) {
+				$ids = [];
+				foreach ($this->game->getPlayers() as $p) {
+					$ids[$p->getIndex()] = $p->getFightUser()->user_id;
+				}
+				$response->setIds($ids);
+				unset($ids);
+			}
+		}
+		$response->setText($this->text)
+			->setId($this->id);
+
+		return $response->getResponse();
 	}
 }

@@ -98,18 +98,6 @@ class FightManager {
 	}
 
 	/**
-	 * Send message to user
-	 * @deprecated
-	 * @param $id
-	 * @param $data
-	 */
-	public function sendTo($id, $data) {
-		if (isset($this->clientsData[$id])) {
-			$this->fights[$this->clientsData[$id]['fight']]->getPlayer($this->clientsData[$id]['index'])->send($data);
-		}
-	}
-
-	/**
 	 * Get fight router
 	 * @return FightRouter
 	 */
