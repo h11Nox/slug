@@ -178,13 +178,17 @@ var fight = {
 		}
 
 		var $rows = this._holder.find('.card-row');
-		this.player1.setCardRow($rows.eq(0));
-		this.player2.setCardRow($rows.eq(1));
+		for (var i=1; i<=2; i++) {
+			var player = this.getPlayerByIndex(i);
+			player.setCardRow($rows.eq(i-1));
+			player.addCards(data.data[i]['cards']);
+			player.addHandCards(data.data[i]['hand']);
+			player.updateData(data);
 
-		this.player1.addCards(data.data[1]['cards']);
-		this.player2.addCards(data.data[2]['cards']);
-
-		this.getPlayerByIndex(data.active).setActive();
+			if (i == data.active) {
+				player.setActive();
+			}
+		}
 	},
 	message : function(m) {
 		this.chat.find('.holder').append('<p>' + m + '</p>');
@@ -364,6 +368,9 @@ player.prototype = {
 	},
 	addCards : function(data) {
 		this._cards.add(data);
+	},
+	addHandCards : function(data) {
+		//
 	},
 	setActive : function() {
 		if (!this.active) {

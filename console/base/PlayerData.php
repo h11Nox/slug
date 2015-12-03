@@ -52,12 +52,19 @@ class PlayerData extends \common\base\PlayerData{
 			'mp' => $this->getPoints(),
 			'maxMp' => $this->getMaxPoint(),
 			'cards' => [],
+			'hand' => []
 		];
 
 		foreach ($this->cards as $card) {
 			$response['cards'][] = $card->getAttributes();
 		}
 		array_walk($response['cards'], [$this, 'prepareCard']);
+		foreach ($this->hand as $card) {
+			$response['hand'][] = [
+				'card' => $card['card']->getAttributes(),
+				'data' => $card['data'],
+			];
+		}
 
 		return $response;
 	}

@@ -269,6 +269,7 @@ h2{
 	border: 1px solid #bce8f1;
 	padding: 5px;
 	height: 400px;
+	overflow-y: auto;
 }
 .chat p{
 	font-size: 12px;
