@@ -8,6 +8,7 @@ use yii\base\Object;
  */
 class Player extends Object {
 
+	protected $index;
 	protected $_user;
 	protected $_owner;
 	protected $data;
@@ -19,6 +20,22 @@ class Player extends Object {
 		$this->_user = $user;
 		$this->_owner = (bool)$user->is_owner;
 		$this->data = $this->getPlayerData();
+	}
+
+	/**
+	 * Set index
+	 * @param $index
+	 */
+	public function setIndex($index) {
+		$this->index = $index;
+	}
+
+	/**
+	 * Get user index
+	 * @return mixed
+	 */
+	public function getIndex() {
+		return $this->index;
 	}
 
 	/**

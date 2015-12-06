@@ -2,6 +2,9 @@ html,
 body {
 	height: 100%;
 }
+body{
+	background-color: rgba(115, 110, 110, 0.82);
+}
 body, body *{
 	font-family: 'Roboto', sans-serif;
 }
@@ -10,11 +13,11 @@ body, body *{
 	min-height: 100%;
 	height: auto;
 	margin: 0 auto -60px;
-	padding: 0 0 60px;
+	padding: 0;
 }
 
 .wrap > .container {
-	padding: 70px 15px 20px;
+	padding: 40px 15px 20px;
 }
 
 .footer {
@@ -165,6 +168,9 @@ h2{
 	float: left;
 	width: 190px;
 }
+.player-block .c-holder .img{
+	border: 1px solid white;
+}
 .player-block .c-holder > *{
 	float: left;
 }
@@ -175,7 +181,7 @@ h2{
 .m-point{
 	width: 11px;
 	height: 80px;
-	margin-right: 8px;
+	margin-right: 6px;
 	display: inline-block;
 	position: relative;
 }
@@ -208,6 +214,25 @@ h2{
 .game-field .card-row[data-index="1"]{
 	margin-bottom: 20px;
 }
+.game-field .card-row li div{
+	position: relative;
+}
+.game-field .card-row li div .attack, .game-field .card-row li div .hp{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 20px;
+	height: 20px;
+	color: #fff;
+	background-color: rgba(83, 183, 51, 0.84);
+	font-size: 16px;
+	text-align: center;
+}
+.game-field .card-row li div .hp {
+	left: auto;
+	right: 0;
+	background-color: rgba(230, 16, 16, 0.92);
+}
 .card-list, .card-row{
 	list-style: none;
 	margin: 0;
@@ -223,6 +248,13 @@ h2{
 }
 .card-list li img, .card-row li img{
 	max-width: 100%;
+}
+.card-list li.selected{
+	position: relative;
+	top: -7px;
+	-moz-box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.64);
+	-webkit-box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.64);
+	box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.64);
 }
 .card-row li{
 	display: inline-block;
@@ -289,12 +321,24 @@ h2{
 	margin-left: 7px;
 	height: 80px;
 	padding-top: 46px;
+	position: relative;
 }
 .player-holder.active .timer{
 	display: block;
 }
+.player-holder.active .fight-phase{
+	display: block;
+}
 .player-holder.active.current .right-panel{
-	padding-top: 14px;
+	padding-top: 20px;
+}
+.player-holder .fight-phase{
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	text-align: center;
 }
 .timer{
 	display: none;
@@ -313,4 +357,15 @@ h2{
 }
 .end-turn a{
 	display: block;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+body.selected-card.selected-card-1 .unit-2{
+	border: 1px solid red;
+	-moz-box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.61);
+	-webkit-box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.61);
+	box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.61);
+	position: relative;
+	top: -7px;
+	cursor: pointer;
 }

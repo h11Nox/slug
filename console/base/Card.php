@@ -25,12 +25,19 @@ class Card {
 	protected $params = [];
 
 	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->init();
+	}
+
+	/**
 	 * Getting unknown card property
 	 * @param $attribute
 	 * @return bool
 	 */
 	public function __get($attribute) {
-		if (in_array($attribute, $this->params)) {
+		if (in_array($attribute, $this->getParamsList())) {
 			return $this->{$attribute};
 		} else {
 			return !trigger_error('Card property does not exist');
@@ -43,11 +50,34 @@ class Card {
 	 * @param $value
 	 */
 	public function __set($attribute, $value) {
-		if (in_array($attribute, $this->params)) {
+		if (in_array($attribute, $this->getParamsList())) {
 			$this->{$attribute} = $value;
 		} else {
 			trigger_error('Card property does not exist');
 		}
+	}
+
+	/**
+	 * Initialization function
+	 */
+	protected function init() {
+		// do init
+	}
+
+	/**
+	 * Do something after turn
+	 * @note Will be called externally
+	 * Allows to do smth. after user ended his turn
+	 */
+	public function afterTurn() {}
+
+	/**
+	 * Return list of additional params
+	 *
+	 * @return array
+	 */
+	protected function getAdditionalParams() {
+		return [];
 	}
 
 	/**
@@ -76,12 +106,21 @@ class Card {
 	}
 
 	/**
+	 * Get params list
+	 *
+	 * @return array
+	 */
+	protected function getParamsList() {
+		return array_merge($this->params, $this->getAdditionalParams());
+	}
+
+	/**
 	 * Get card params
 	 * @return array
 	 */
 	public function getParams() {
 		$data = [];
-		foreach ($this->params as $param) {
+		foreach ($this->getParamsList() as $param) {
 			$data[$param] = $this->{$param};
 		}
 
@@ -116,6 +155,21 @@ class Card {
 	 */
 	public function getIndex() {
 		return $this->index;
+	}
+
+	/**
+	 * Get card response
+	 *
+	 * @return array
+	 */
+	public function getResponse() {
+		return [
+			'card' => array_merge($this->getAttributes(), [
+				'id' => $this->getIndex(),
+				'text' => $this->getHtml(),
+			]),
+			'data' => $this->getParams(),
+		];
 	}
 
 	/**

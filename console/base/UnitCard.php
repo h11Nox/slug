@@ -1,12 +1,14 @@
 <?php
 namespace console\base;
+
+use console\base\interfaces\UnitInterface;
 use yii\helpers\Html;
 
 /**
  * Class UnitCard
  * @package console\base
  */
-class UnitCard extends Card implements Damageable {
+class UnitCard extends Card implements UnitInterface {
 
 	/**
 	 * Params
@@ -15,10 +17,33 @@ class UnitCard extends Card implements Damageable {
 	protected $params = [ 'damage', 'hp' ];
 
 	/**
+	 * Do initialization
+	 */
+	protected function init() {
+		$this->ready = 0;
+	}
+
+	/**
+	 * Get additional params list
+	 *
+	 * @return array
+	 */
+	protected function getAdditionalParams() {
+		return [ 'ready' ];
+	}
+
+	/**
+	 * Do after turn action
+	 */
+	public function afterTurn() {
+		$this->ready = 1;
+	}
+
+	/**
 	 * Damage player
 	 * @param Player $player
 	 */
-	public function damage(Player $player) {
+	public function attack(Player $player) {
 
 	}
 
@@ -42,5 +67,18 @@ class UnitCard extends Card implements Damageable {
 		return Html::tag('div', $content, [
 			'data-type' => $this->type
 		]);
+	}
+
+	/**
+	 * Provides possibility to damaged
+	 *
+	 * @param $damage
+	 * @return void
+	 */
+	public function receiveDamage($damage) {
+		$this->hp -= $damage;
+		if ($this->hp <= 0) {
+			// kill unit
+		}
 	}
 }

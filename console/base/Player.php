@@ -1,17 +1,18 @@
 <?php
 namespace console\base;
-use backend\models\User;
+
 use console\base\events\UseCardEvent;
 use console\base\events\UserSendEvent;
 use console\base\http\Response;
+use console\base\interfaces\Damageable;
+use console\base\interfaces\UnitInterface;
 use Ratchet\ConnectionInterface;
 
 /**
  * Player Class
  */
-class Player extends \common\base\Player {
+class Player extends \common\base\Player implements UnitInterface {
 
-	protected $index;
 	protected $game;
 	protected $connected = false;
 	protected $new = true;
@@ -25,14 +26,6 @@ class Player extends \common\base\Player {
 	 */
 	public function init(){
 		$this->data = $this->getPlayerData();
-	}
-
-	/**
-	 * Get user index
-	 * @return mixed
-	 */
-	public function getIndex() {
-		return $this->index;
 	}
 
 	/**
@@ -79,13 +72,23 @@ class Player extends \common\base\Player {
 	/**
 	 * Use the card
 	 * @param $cardID
+	 * @param array $data
 	 */
-	public function useCard($cardID) {
+	public function useCard($cardID, $data = []) {
+		if (!is_object($data)) {
+			$data = (object)$data;
+		}
 		$card = $this->data->getCard($cardID);
 		$card->setIndex($cardID);
 		if ($card->cost <= $this->data->getPoints()) {
 			// Use mp
-			$this->data->useCard($cardID);
+			if ($card instanceof Damageable) {
+				$type = 'damage';
+				$card->damage($data->type === 'player' ? $this->getOpponent() : '', $card->damage);
+			} else {
+				$type = 'unit';
+			}
+			$this->data->useCard($cardID, $type);
 
 			// Trigger card usage event
 			$event = new UseCardEvent();
@@ -167,14 +170,6 @@ class Player extends \common\base\Player {
 	}
 
 	/**
-	 * Set index
-	 * @param $index
-	 */
-	public function setIndex($index) {
-		$this->index = $index;
-	}
-
-	/**
 	 * Get opponent
 	 * @return mixed
 	 */
@@ -226,5 +221,15 @@ class Player extends \common\base\Player {
 	 */
 	public function isActive() {
 		return $this->active;
+	}
+
+	/**
+	 * Provides possibility to damaged
+	 *
+	 * @param $damage
+	 * @return void
+	 */
+	public function receiveDamage($damage) {
+		$this->getData()->receiveDamage($damage);
 	}
 }

@@ -32,7 +32,7 @@ use yii\helpers\Html;
 				<span class="m-point progress" data-max="10">
 					<span style="height: 100%;" data-value="10"></span>
 				</span>
-				<span class="img">
+				<span class="img unit-<?php echo $player->getIndex(); ?>">
 					<?php echo Html::img($player->user->img->getThumb('80x80'), [
 						'class' => 'player-photo',
 						'alt' => $player->user->username,
@@ -43,11 +43,11 @@ use yii\helpers\Html;
 					<span>
 						<?php echo $player->data->getHealth(); ?>
 					</span>
-					<div class="message"></div>
 				</span>
 			</div>
 
 			<div class="right-panel">
+				<div class="fight-phase">&nbsp;</div>
 				<div class="end-turn">
 					<a href="#" class="btn btn-info btn-small">Закончить</a>
 				</div>

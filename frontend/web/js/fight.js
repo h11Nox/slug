@@ -9,6 +9,8 @@ var fight = {
 	player1 : null,
 	player2 : null,
 	locked : false,
+	active : 1,
+	phase : 1,
 	_freeze : false,
 	_holder : null,
 	_interval : null,
@@ -117,6 +119,10 @@ var fight = {
 	process : function (data) {
 		logger.show('Server response:');
 		logger.show(data);
+		if (typeof data.phase != 'undefined') {
+			this.active = data.active;
+			this.phase = data.phase;
+		}
 
 		switch (data.action) {
 			case 'connect':
@@ -252,6 +258,9 @@ var fight = {
 	},
 	isFreeze : function() {
 		return this._freeze;
+	},
+	getPhase : function() {
+		return this.phase;
 	}
 };
 
@@ -261,6 +270,7 @@ var player = function(options) {
 	}
 	var defaultOptions = {
 		block : null,
+		phaseBlock : null,
 		index : -1,
 		id : null,
 		hp : 20,
@@ -292,6 +302,7 @@ player.prototype = {
 			player : this
 		});
 		this.img = this.block.find('img.player-photo:first');
+		this.phaseBlock = this.block.find('.fight-phase');
 
 		var cardsList = this.block.find('.card-list');
 
@@ -307,6 +318,10 @@ player.prototype = {
 			return false;
 		});
 
+		this.block.on('click', '.player-photo', function(){
+			self.getOpponent().getCards().clickHero();
+			return false;
+		});
 		this.initAll();
 	},
 	reInit : function() {
@@ -326,11 +341,12 @@ player.prototype = {
 		logger.show('Player ' + this.index + ' initialized observer');
 
 		var self = this;
-		$(document).on('player' + this.index + '-useCard', function(event, id) {
+		$(document).on('player' + this.index + '-useCard', function(event, id, data) {
 			logger.show('Player ' + self.index + ' used card');
 			fight.send({
 				action : 'use',
-				card : id
+				card : id,
+				data : data
 			});
 		});
 		$(document).on('player-' + this.index + '-use-card', function(event, data){
@@ -338,7 +354,8 @@ player.prototype = {
 
 			fight.lock(true);
 			self.updateData(data);
-			self._cards.use(data.card.data.id, data.card.data);
+			self.getOpponent().updateData(data);
+			self._cards.use(data.card);
 			fight.lock(false);
 		});
 		$(document).on('player-' + this.index + '-end-turn', function(event, data){
@@ -351,6 +368,9 @@ player.prototype = {
 			fight.unfreeze();
 		});
 	},
+	getCards : function() {
+		return this._cards;
+	},
 	updateData : function(response) {
 		var data = response.data[this.index];
 		if (this.mp !== data.mp) {
@@ -362,24 +382,34 @@ player.prototype = {
 			this.maxMp = data.maxMp;
 			this.block.find('.m-point-info > span:eq(1)').html(this.maxMp);
 		}
+		if (this.hp !== data.health) {
+			this.hp = data.health;
+			this.block.find('.health span').html(this.hp);
+		}
 	},
 	getOpponent : function() {
 		return fight.getPlayerByIndex(this.index == 1 ? 2 : 1);
+	},
+	getIndex : function() {
+		return this.index;
 	},
 	addCards : function(data) {
 		this._cards.add(data);
 	},
 	addHandCards : function(data) {
-		//
+		this._cards.addToHand(data);
 	},
 	setActive : function() {
 		if (!this.active) {
+			this.phaseBlock.html(messages.game['phase' + fight.getPhase()]);
 			this.getOpponent().setNoActive();
 
 			this.block.addClass(this.cssStyle.activeClass);
 			if (this.isCurrent()) {
 				this.block.addClass(this.cssStyle.currentClass);
-				this._cards.onEvents();
+				if (fight.getPhase() === 1) {
+					this._cards.onEvents();
+				}
 			}
 			this.active = true;
 			this.timer.start();
@@ -387,6 +417,7 @@ player.prototype = {
 	},
 	setNoActive : function() {
 		if (this.active) {
+			this.phaseBlock.html(messages.game['phase' + fight.getPhase()]);
 			this.active = false;
 
 			this.block.removeClass(this.cssStyle.activeClass)
@@ -441,12 +472,21 @@ var cards = function(options) {
 	var defaultOptions = {
 		player : null,
 		list : null,
+		hand : {},
 		items : null,
 		count : 0,
 		row : null,
 		emptyClass : 'empty',
 		locked : false,
-		maxCount : 5
+		maxCount : 5,
+		isOn : false,
+		backPath : '/img/default_back.jpg',
+		selected  : null,
+		cssStyle : {
+			activeClass : 'selected',
+			activeBodyClass : 'selected-card',
+			unitClass : 'unit'
+		}
 	};
 	options = $.extend(defaultOptions, options);
 	$.extend(this, options);
@@ -467,21 +507,42 @@ cards.prototype = {
 		var self = this;
 		$.each(cards, function(index, item) {
 			var card = $('<div></div>');
-			$.each({1 : 'cost', 2 : 'type', 3 : 'id'}, function(index, value) {
-				card.attr('data-'+value, item[value])
-					.data(value, item[value]);
-			});
-			card.removeClass(this.emptyClass)
-				.html('<img src="' + item.img + '" /><span>' + item.cost + '</span>');
+			if (self.player.isCurrent()) {
+				$.each({1 : 'cost', 2 : 'type', 3 : 'id'}, function(index, value) {
+					card.attr('data-'+value, item[value])
+						.data(value, item[value]);
+				});
+				card.html('<img src="' + item.img + '" /><span>' + item.cost + '</span>');
 
-			card.hide();
+				card.hide();
+			} else {
+				card.html('<img src="' + self.backPath + '" />');
+			}
+
 			self.items.eq(self.count).removeClass(self.emptyClass).html('')
 				.append(card);
 			card.fadeIn(1000);
 			self.count++;
 		});
 	},
+	addToHand : function(data) {
+		for (var i in data) {
+			var card = $('<div></div>');
+			card.html(
+				'<img src="' + data[i].card.img + '" />'
+				+ '<span class="attack">' + data[i].data.damage + '</span>'
+				+ '<span class="hp">' + data[i].data.hp + '</span>'
+			);
+			var $item = $('<li></li>');
+			$item.addClass('unit-' + this.getIndex());
+			this.row.append($item.append(card));
+		}
+	},
 	onEvents : function() {
+		if (this.isOn) {
+			return ;
+		}
+		this.isOn = true;
 		for(var i = 0; i<this.count; i++){
 			this.items.eq(i).css('cursor', 'pointer');
 		}
@@ -491,6 +552,11 @@ cards.prototype = {
 		});
 	},
 	offEvents : function() {
+		if (!this.isOn) {
+			return ;
+		}
+		this.isOn = false;
+
 		for (var i = 0; i<this.count; i++) {
 			this.items.eq(i).css('cursor', 'default');
 		}
@@ -501,27 +567,74 @@ cards.prototype = {
 		if (fight.isLocked()) {
 			return false;
 		}
+		if ($card.hasClass(this.cssStyle.activeClass)) {
+			this.unselect();
+			return false;
+		}
+		if (!this.checkMp($card)) {
+			return false;
+		}
 
+		if (cardTypes[$card.find('> div').data('type')] === 'unit') {
+			this.doUseCard($card);
+		} else {
+			this.select($card);
+		}
+	},
+	checkMp : function($card) {
 		if (parseInt($card.find('> div').data('cost')) > this.player.mp) {
 			this.player.message(messages.mpOut);
 			return false;
 		}
-
-		var data = $card.find('> div').data();
-		observer.trigger('player' + this.getIndex() + '-useCard', [ data.id ]);
+		return true;
+	},
+	doUseCard : function($card, data) {
+		if (typeof data === 'undefined') {
+			data = {};
+		}
+		this.unselect();
+		observer.trigger('player' + this.getIndex() + '-useCard', [
+			$card.find('> div').data('id'),
+			data
+		]);
+	},
+	unselect : function() {
+		this.selected = null;
+		$('body').removeClass(this.cssStyle.activeBodyClass)
+			.removeClass(this.cssStyle.activeBodyClass + '-' + this.getIndex());
+		this.items.removeClass(this.cssStyle.activeClass);
+	},
+	select : function($card) {
+		this.unselect();
+		this.selected = parseInt($card.find('> div').data('id'));
+		$('body').addClass(this.cssStyle.activeBodyClass)
+			.addClass(this.cssStyle.activeBodyClass + '-' + this.getIndex());
+		$card.addClass(this.cssStyle.activeClass);
+	},
+	clickHero : function() {
+		if (this.selected !== null) {
+			var $card = this.items.eq(this.selected);
+			if (this.checkMp($card)) {
+				this.doUseCard($card, {
+					type : 'player'
+				});
+			}
+		}
 	},
 	getIndex : function() {
 		return this.player.index;
 	},
-	use : function(index, card) {
+	use : function(card) {
+		var index = card.card.id;
 		var $card = this.items.eq(index);
 		// Use the card
 		// Decrease MP. MP points will be changed after server response
 		// But it still provides error message about mp points running out
 		this.player.mp -= parseInt($card.find('> div').data('cost'));
 
-		var $c = $('<li>' + card.text + '</li>');
-		this.row.append($c);
+		if (cardTypes[card.card.type] === 'unit') {
+			this.addToHand([card]);
+		}
 		this.clearRow($card, index + 1);
 		this.count--;
 
@@ -597,7 +710,7 @@ timer.prototype = {
 	},
 	end : function() {
 		this.stop();
-		this.player.endTurn();
+		// this.player.endTurn();
 		/** observer.trigger('player' + this.player.index + '-timeout', []); */
 	},
 	stop : function() {
@@ -606,13 +719,23 @@ timer.prototype = {
 		}
 	},
 	destroy : function() {
-		this.stop();
 		this.time = this.timePerMove;
 		this.started = false;
+		this.stop();
 	}
 };
 
+var cardTypes = {
+	1 : 'unit',
+	2 : 'damage',
+	3 : 'boost'
+};
+
 var messages = {
+	game : {
+		phase1 : 'Фаза атаки',
+		phase2 : 'Фаза защиты'
+	},
 	mpOut : 'Недостаточно энергии'
 };
 

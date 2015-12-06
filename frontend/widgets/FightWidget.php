@@ -23,12 +23,14 @@ class FightWidget extends ActionWidget {
 		$game = new Game();
 
 		$player = new Player();
+		$player->setIndex(1);
 		$player->initialize($this->fight->owner);
 		$game->setPlayer1($player);
 
 		$owner = Yii::$app->user->getIdentity()->cid == $this->fight->owner->user_id;
-		if (!$owner) {
+		if (empty($owner)) {
 			$player2 = new Player();
+			$player2->setIndex(2);
 			$player2->initialize($this->fight->user);
 			$game->setPlayer2($player2);
 		}
@@ -52,6 +54,7 @@ class FightWidget extends ActionWidget {
 
 		$game = new Game();
 		$player = new Player();
+		$player->setIndex(2);
 		$player->initialize($fight->user);
 		$game->setPlayer2($player);
 

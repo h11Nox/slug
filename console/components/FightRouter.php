@@ -160,7 +160,7 @@ class FightRouter {
 		$this->manager
 			->getFight($data->fight)
 			->getPlayer($data->index)
-			->useCard($data->card);
+			->useCard($data->card, $data->data);
 	}
 
 	/**

@@ -7,13 +7,14 @@ namespace common\base;
 class PlayerData{
 
 	protected $points = 10;
+	protected $hp = 20;
 
 	/**
 	 * Get current user health
 	 * @return int
 	 */
 	public function getHealth() {
-		return 20;
+		return $this->hp;
 	}
 
 	/**

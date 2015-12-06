@@ -79,6 +79,7 @@ class FightUser extends \yii\db\ActiveRecord
         foreach($items as $item){
             $ids[] = $item->id;
         }
+        shuffle($ids);
 
         $this->updateAttributes(['cards_list' => implode(',', $ids)]);
     }

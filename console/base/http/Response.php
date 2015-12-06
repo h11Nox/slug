@@ -111,13 +111,7 @@ class Response {
 				->setDataParam($this->player->getIndex(), $this->player->getResponse());
 		}
 		if (!empty($this->card)) {
-			$response->setCard([
-				'data' => array_merge($this->card->getAttributes(), [
-					'id' => $this->card->getIndex(),
-					'text' => $this->card->getHtml()
-				]),
-				'params' => $this->card->getParams()
-			]);
+			$response->setCard($this->card->getResponse());
 		}
 		if (!empty($this->players)) {
 			foreach ($this->players as $p) {
@@ -134,6 +128,10 @@ class Response {
 				}
 				$response->setIds($ids);
 				unset($ids);
+			} else {
+				foreach ($this->game->getPlayers() as $p) {
+					$response->setDataParam($p->getIndex(), $p->getResponse());
+				}
 			}
 		}
 		$response->setText($this->text)

@@ -213,6 +213,11 @@ class Game extends \common\base\Game {
 		$response = (new Response())
 			->setAction('endTurn')
 			->setPlayer($player);
+
+		array_map(function($p){
+			$p->getData()->afterTurn();
+		}, $this->getPlayers());
+
 		$this->send($response);
 	}
 
@@ -223,8 +228,9 @@ class Game extends \common\base\Game {
 	protected function useCard($event) {
 		$response = (new Response())
 			->setAction('use')
+			->setCard($event->card)
 			->setPlayer($event->player)
-			->setCard($event->card);
+			->setFight($this);
 		$this->send($response);
 	}
 
