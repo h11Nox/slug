@@ -10,6 +10,35 @@ class PlayerData extends \common\base\PlayerData {
 
 	protected $cards = [];
 	protected $hand = [];
+	protected $timer;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->timer = new PlayerTimer();
+	}
+
+	/**
+	 * Get player time
+	 * @return mixed
+	 */
+	public function getTime() {
+		try {
+			$time = $this->timer->getTime();
+		} catch (TimerException $e) {
+			$time = -1;
+		}
+		return $time;
+	}
+
+	/**
+	 * Get timer
+	 * @return PlayerTimer
+	 */
+	public function getTimer() {
+		return $this->timer;
+	}
 
 	/**
 	 * Add cards to user
@@ -89,7 +118,8 @@ class PlayerData extends \common\base\PlayerData {
 			'mp' => $this->getPoints(),
 			'maxMp' => max($this->getPoints(), $this->getMaxPoint()),
 			'cards' => [],
-			'hand' => []
+			'hand' => [],
+			'time' => $this->getTime()
 		];
 
 		foreach ($this->cards as $card) {

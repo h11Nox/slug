@@ -73,6 +73,7 @@ class FightRouter {
 		}
 
 		if ($isReconnect && $fight->isFull()) {
+			$fight->getPlayer(1)->startTimer();
 			$response = (new Response())
 				->setAction('reconnect')
 				->setPlayers($fight->getPlayers())

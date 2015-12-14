@@ -70,9 +70,23 @@ class FightUser extends \yii\db\ActiveRecord
     }
 
     /**
+     * Get card list
+     * Shuffle and get new if list is empty
+     * @return int
+     */
+    public function getCardList() {
+        if (empty($this->cards_list)) {
+            $this->shuffle();
+            $this->refresh();
+        }
+
+        return $this->cards_list;
+    }
+
+    /**
      * Shuffle cards
      */
-    public function shuffle(){
+    public function shuffle() {
         $items = DeckCard::find()->select('id')->where('deck_id = :id', [':id' => $this->deck->id])
             ->all();
         $ids = [];
@@ -91,7 +105,7 @@ class FightUser extends \yii\db\ActiveRecord
      */
     public function getCards($number = 1, $info = true){
         $cards = explode(',', $this->cards_list);
-        $offset = (int)$this->cards;
+        $offset = 0; // (int)$this->cards;
         // $this->updateAttributes(['cards' => $offset + $number]);
         $result = array_slice($cards, $offset, $number);
         if($info){

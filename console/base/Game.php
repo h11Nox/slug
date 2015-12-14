@@ -206,8 +206,8 @@ class Game extends \common\base\Game {
 		if ($player->getIndex() !== $index) {
 			throw new GameException('User is not active already');
 		}
-		$player->setActive(false);
-		$this->getOpponent($player->getIndex())->setActive(true);
+		$player->setActive(false)->stopTimer();
+		$this->getOpponent($player->getIndex())->setActive(true)->startTimer();
 
 		$this->phase->end();
 		$response = (new Response())

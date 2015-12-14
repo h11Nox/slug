@@ -29,10 +29,11 @@ class CardFactory {
 
 	/**
 	 * Set cards Ids
+	 * Delegate to self::setIds()
 	 * @param $ids
 	 */
 	public function setCards($ids) {
-		$this->ids = is_string($ids) ? explode(',', $ids) : $ids;
+		$this->setIds($ids);
 	}
 
 	/**

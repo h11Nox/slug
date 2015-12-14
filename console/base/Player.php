@@ -67,7 +67,7 @@ class Player extends \common\base\Player implements UnitInterface {
 	 * Init Card;
 	 */
 	public function initCards() {
-		$this->getCards()->setIds($this->_user->cards_list);
+		$this->getCards()->setIds($this->_user->getCardList());
 	}
 
 	/**
@@ -121,6 +121,7 @@ class Player extends \common\base\Player implements UnitInterface {
 	public function connect(ConnectionInterface $conn) {
 		$this->connected = true;
 		$this->connection = $conn;
+		$this->getData()->getTimer()->reconnect();
 	}
 
 	/**
@@ -129,6 +130,7 @@ class Player extends \common\base\Player implements UnitInterface {
 	public function disconnect() {
 		$this->connected = false;
 		$this->connection = null;
+		$this->getData()->getTimer()->stop();
 	}
 
 	/**
@@ -200,6 +202,24 @@ class Player extends \common\base\Player implements UnitInterface {
 	}
 
 	/**
+	 * Start timer
+	 * @return $this
+	 */
+	public function startTimer() {
+		$this->getData()->getTimer()->start();
+		return $this;
+	}
+
+	/**
+	 * Stop timer
+	 * @return $this
+	 */
+	public function stopTimer() {
+		$this->getData()->getTimer()->stop();
+		return $this;
+	}
+
+	/**
 	 * Set if is new
 	 * @param $new
 	 */
@@ -218,9 +238,11 @@ class Player extends \common\base\Player implements UnitInterface {
 	/**
 	 * Set if user is active
 	 * @param $active
+	 * @return $this
 	 */
 	public function setActive($active) {
 		$this->active = $active;
+		return $this;
 	}
 
 	/**

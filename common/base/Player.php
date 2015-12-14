@@ -8,7 +8,9 @@ use yii\base\Object;
  */
 class Player extends Object {
 
+	/** @var int $index */
 	protected $index;
+	/** @var FightUser $_user */
 	protected $_user;
 	protected $_owner;
 	protected $data;
