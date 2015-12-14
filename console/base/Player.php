@@ -4,6 +4,7 @@ namespace console\base;
 use console\base\events\UseCardEvent;
 use console\base\events\UserSendEvent;
 use console\base\http\Response;
+use console\base\interfaces\Boostable;
 use console\base\interfaces\Damageable;
 use console\base\interfaces\UnitInterface;
 use Ratchet\ConnectionInterface;
@@ -51,7 +52,7 @@ class Player extends \common\base\Player implements UnitInterface {
 	 * Get user response data
 	 * @return mixed
 	 */
-	public function getResponse(){
+	public function getResponse() {
 		return $this->data->getResponse();
 	}
 
@@ -73,6 +74,7 @@ class Player extends \common\base\Player implements UnitInterface {
 	 * Use the card
 	 * @param $cardID
 	 * @param array $data
+	 * @throws InvalidUnitTypeException
 	 */
 	public function useCard($cardID, $data = []) {
 		if (!is_object($data)) {
@@ -83,12 +85,18 @@ class Player extends \common\base\Player implements UnitInterface {
 		if ($card->cost <= $this->data->getPoints()) {
 			// Use mp
 			if ($card instanceof Damageable) {
-				$type = 'damage';
-				$card->damage($data->type === 'player' ? $this->getOpponent() : '', $card->damage);
-			} else {
-				$type = 'unit';
+				if (!in_array($data->type, ['player', 'unit'])) {
+					throw new InvalidUnitTypeException();
+				}
+				$unit = $this->getOpponent();
+				if ($data->type === 'unit') {
+					$unit = $unit->getData()->getHandCard($data->index);
+				}
+				$card->damage($unit, $card->damage);
+			} elseif ($card instanceof Boostable) {
+				$card->boost($this);
 			}
-			$this->data->useCard($cardID, $type);
+			$this->data->useCard($cardID);
 
 			// Trigger card usage event
 			$event = new UseCardEvent();
@@ -233,3 +241,5 @@ class Player extends \common\base\Player implements UnitInterface {
 		$this->getData()->receiveDamage($damage);
 	}
 }
+
+class InvalidUnitTypeException extends \Exception{}

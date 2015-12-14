@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-frontend',
+    'homeUrl' => '/',
     'name' => 'Slug',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
@@ -20,6 +21,9 @@ return [
             'identityCookie' => [
                 'name' => '_frontend'
             ]
+        ],
+        'session' => [
+            'name' => '_frontendSessionId'
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

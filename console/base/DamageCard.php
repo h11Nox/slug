@@ -24,4 +24,12 @@ class DamageCard extends Card implements Damageable {
 	public function damage(UnitInterface $unit, $damage) {
 		$unit->receiveDamage($damage);
 	}
+
+	/**
+	 * Get usage
+	 * @return int
+	 */
+	protected function getUsage() {
+		return static::USAGE_UNIT_OR_HERO;
+	}
 }

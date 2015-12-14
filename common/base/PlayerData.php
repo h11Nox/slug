@@ -4,7 +4,7 @@ namespace common\base;
 /**
  * Player Data
  */
-class PlayerData{
+class PlayerData {
 
 	protected $points = 10;
 	protected $hp = 20;
@@ -39,5 +39,13 @@ class PlayerData{
 	 */
 	public function usePoints($points) {
 		$this->points -= $points;
+	}
+
+	/**
+	 * Add points
+	 * @param $points
+	 */
+	public function addPoints($points) {
+		$this->points += $points;
 	}
 }

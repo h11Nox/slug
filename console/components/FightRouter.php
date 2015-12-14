@@ -1,5 +1,6 @@
 <?php
 namespace console\components;
+
 use common\models\Fight;
 use common\models\FightUser;
 use common\models\User;

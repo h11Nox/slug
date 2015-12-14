@@ -55,6 +55,16 @@ class SiteController extends Controller
     /**
      * @inheritdoc
      */
+    public function beforeAction($action) {
+        if ($this->action->id !== 'index' && Yii::$app->getUser()->getIsGuest()) {
+            $this->goHome();
+        }
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function actions()
     {
         return [

@@ -194,6 +194,7 @@ h2{
 	width: 100%;
 }
 .health{
+	position: relative;
 	padding: 54px 0 0 5px;
 }
 .health span{
@@ -201,6 +202,31 @@ h2{
 	background-color: #dff0d8;
 	border: 1px solid #d6e9c6;
 	color: #234E25;
+}
+.health .card{
+	display: none;
+	height: 46px;
+	width: 31px;
+	top: 0;
+	position: absolute;
+}
+.health .card img{
+	width: 100%;
+	border: 1px solid rgba(16, 136, 21, 0.79);
+}
+.health span.damaged{
+	background: rgba(213, 94, 97, 0.67);
+	-webkit-transition: background 1s;
+	-moz-transition: background 1s;
+	-o-transition: background 1s;
+	transition: background 1s;
+}
+.health span.damaged.damage-restore{
+	background: #dff0d8;
+	-webkit-transition: background 1s;
+	-moz-transition: background 1s;
+	-o-transition: background 1s;
+	transition: background 1s;
 }
 
 .game-field.empty{
@@ -360,7 +386,7 @@ h2{
 	padding-top: 0;
 	padding-bottom: 0;
 }
-body.selected-card.selected-card-1 .unit-2{
+body.selected-card.selected-card-1 .unit-2, body.selected-card.selected-card-2 .unit-1{
 	border: 1px solid red;
 	-moz-box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.61);
 	-webkit-box-shadow: 3px 3px 4px rgba(68, 68, 68, 0.61);

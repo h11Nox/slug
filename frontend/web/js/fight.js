@@ -189,7 +189,7 @@ var fight = {
 			player.setCardRow($rows.eq(i-1));
 			player.addCards(data.data[i]['cards']);
 			player.addHandCards(data.data[i]['hand']);
-			player.updateData(data);
+			player.updateData(data, true);
 
 			if (i == data.active) {
 				player.setActive();
@@ -279,7 +279,9 @@ var player = function(options) {
 		active : false,
 		cssStyle : {
 			activeClass : 'active',
-			currentClass : 'current'
+			currentClass : 'current',
+			damageClass : 'damaged',
+			damageRestoreClass : 'damage-restore'
 		}
 	};
 	options = $.extend(defaultOptions, options);
@@ -371,7 +373,8 @@ player.prototype = {
 	getCards : function() {
 		return this._cards;
 	},
-	updateData : function(response) {
+	updateData : function(response, disableAnimation) {
+		var animation = !(typeof disableAnimation !== 'undefined' && disableAnimation);
 		var data = response.data[this.index];
 		if (this.mp !== data.mp) {
 			this.mp = data.mp;
@@ -384,7 +387,17 @@ player.prototype = {
 		}
 		if (this.hp !== data.health) {
 			this.hp = data.health;
-			this.block.find('.health span').html(this.hp);
+
+			if (animation) {
+				var $healthBlock = this.block.find('.health span');
+				$healthBlock.removeClass(this.cssStyle.damageRestoreClass)
+					.removeClass(this.cssStyle.damageClass)
+					.addClass(this.cssStyle.damageClass).html(this.hp);
+				var self = this;
+				setTimeout(function() {
+					$healthBlock.addClass(self.cssStyle.damageRestoreClass);
+				}, 1000);
+			}
 		}
 	},
 	getOpponent : function() {
@@ -482,6 +495,7 @@ var cards = function(options) {
 		isOn : false,
 		backPath : '/img/default_back.jpg',
 		selected  : null,
+		animationDuration : 2000,
 		cssStyle : {
 			activeClass : 'selected',
 			activeBodyClass : 'selected-card',
@@ -498,6 +512,15 @@ cards.prototype = {
 	setRow : function($row) {
 		if (this.row === null) {
 			this.row = $row;
+
+			var self = this;
+			this.row.on('click', 'li', function() {
+				$(document).trigger('player-' + self.getIndex() + '-click-unit', [$(this)]);
+				return false;
+			});
+			$(document).on('player-' + this.player.getOpponent().getIndex() + '-click-unit', function(e, unit) {
+				self.clickUnit(unit);
+			});
 		}
 	},
 	initItems : function() {
@@ -508,7 +531,7 @@ cards.prototype = {
 		$.each(cards, function(index, item) {
 			var card = $('<div></div>');
 			if (self.player.isCurrent()) {
-				$.each({1 : 'cost', 2 : 'type', 3 : 'id'}, function(index, value) {
+				$.each({1 : 'cost', 2 : 'type', 3 : 'id', 4 : 'usage'}, function(index, value) {
 					card.attr('data-'+value, item[value])
 						.data(value, item[value]);
 				});
@@ -527,7 +550,7 @@ cards.prototype = {
 	},
 	addToHand : function(data) {
 		for (var i in data) {
-			var card = $('<div></div>');
+			var card = $('<div data-index="' + i + '"></div>');
 			card.html(
 				'<img src="' + data[i].card.img + '" />'
 				+ '<span class="attack">' + data[i].data.damage + '</span>'
@@ -575,7 +598,7 @@ cards.prototype = {
 			return false;
 		}
 
-		if (cardTypes[$card.find('> div').data('type')] === 'unit') {
+		if ($card.find('> div').data('usage') == 1) {
 			this.doUseCard($card);
 		} else {
 			this.select($card);
@@ -621,6 +644,17 @@ cards.prototype = {
 			}
 		}
 	},
+	clickUnit : function($unit) {
+		if (this.selected !== null) {
+			var $card = this.items.eq(this.selected);
+			if (this.checkMp($card)) {
+				this.doUseCard($card, {
+					type : 'unit',
+					index : $unit.find('> div').data('index')
+				});
+			}
+		}
+	},
 	getIndex : function() {
 		return this.player.index;
 	},
@@ -632,8 +666,17 @@ cards.prototype = {
 		// But it still provides error message about mp points running out
 		this.player.mp -= parseInt($card.find('> div').data('cost'));
 
-		if (cardTypes[card.card.type] === 'unit') {
-			this.addToHand([card]);
+		switch (cardData.types[card.card.type]) {
+			case 'unit':
+				this.addToHand([card]);
+				break;
+			case 'damage':
+				this.player.getOpponent().block.find('.card')
+					.html('<img src="' + card.card.img + '" />').show().fadeOut(this.animationDuration);
+				break;
+			default:
+				//
+				break;
 		}
 		this.clearRow($card, index + 1);
 		this.count--;
@@ -725,10 +768,12 @@ timer.prototype = {
 	}
 };
 
-var cardTypes = {
-	1 : 'unit',
-	2 : 'damage',
-	3 : 'boost'
+var cardData = {
+	types : {
+		1 : 'unit',
+		2 : 'damage',
+		3 : 'boost'
+	}
 };
 
 var messages = {

@@ -40,6 +40,7 @@ use yii\helpers\Html;
 					]); ?>
 				</span>
 				<span class="health">
+					<div class="card"></div>
 					<span>
 						<?php echo $player->data->getHealth(); ?>
 					</span>

@@ -1,6 +1,7 @@
 <?php
 namespace console\base;
 
+use console\base\events\CardEvent;
 use console\base\interfaces\UnitInterface;
 use yii\helpers\Html;
 
@@ -9,6 +10,8 @@ use yii\helpers\Html;
  * @package console\base
  */
 class UnitCard extends Card implements UnitInterface {
+
+	const DEATH_EVENT = 'unit-death';
 
 	/**
 	 * Params
@@ -19,7 +22,7 @@ class UnitCard extends Card implements UnitInterface {
 	/**
 	 * Do initialization
 	 */
-	protected function init() {
+	public function init() {
 		$this->ready = 0;
 	}
 
@@ -70,15 +73,17 @@ class UnitCard extends Card implements UnitInterface {
 	}
 
 	/**
-	 * Provides possibility to damaged
+	 * Provides possibility to be damaged
 	 *
 	 * @param $damage
 	 * @return void
 	 */
 	public function receiveDamage($damage) {
-		$this->hp -= $damage;
+		$this->hp = $this->hp - $damage;
 		if ($this->hp <= 0) {
-			// kill unit
+			$event = new CardEvent();
+			$event->index = $this->index;
+			$this->trigger(static::DEATH_EVENT, $event);
 		}
 	}
 }

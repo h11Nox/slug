@@ -24,6 +24,9 @@ return [
 				'name' => '_backend'
 			]
 		],
+		'session' => [
+			'name' => '_backendSessionId'
+		],
 		'log' => [
 			'traceLevel' => YII_DEBUG ? 3 : 0,
 			'targets' => [

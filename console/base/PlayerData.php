@@ -1,12 +1,12 @@
 <?php
 namespace console\base;
-use console\base\interfaces\Damageable;
+
+use common\models\DeckCard;
 
 /**
  * PlayerData class
  */
-class PlayerData extends \common\base\PlayerData
-{
+class PlayerData extends \common\base\PlayerData {
 
 	protected $cards = [];
 	protected $hand = [];
@@ -28,8 +28,7 @@ class PlayerData extends \common\base\PlayerData
 	 * @return Card
 	 * @throws \Exception
 	 */
-	public function getCard($index)
-	{
+	public function getCard($index) {
 		if (!isset($this->cards[$index])) {
 			throw new \Exception("Undefined card with index {$index}");
 		}
@@ -37,16 +36,28 @@ class PlayerData extends \common\base\PlayerData
 	}
 
 	/**
+	 * Get card from hand by index
+	 * @param $index
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function getHandCard($index) {
+		if (!isset($this->hand[$index])) {
+			throw new \Exception("Undefined card in hand with index {$index}");
+		}
+		return $this->hand[$index];
+	}
+
+	/**
 	 * Remove card by index
 	 * @param $index
-	 * @param null $type
 	 */
-	public function useCard($index, $type = null)
+	public function useCard($index)
 	{
 		if (isset($this->cards[$index])) {
 			$card = $this->cards[$index];
 			$this->usePoints($card->cost);
-			if ($type === 'unit') {
+			if ($card->type == DeckCard::TYPE_WARRIOR) {
 				$this->addToHand($this->cards[$index]);
 			}
 
@@ -64,9 +75,7 @@ class PlayerData extends \common\base\PlayerData
 			$c->afterTurn();
 		};
 		array_map($afterTurn, $this->cards);
-		array_map(function($handCard) use ($afterTurn) {
-			$afterTurn($handCard['card']);
-		}, $this->hand);
+		array_map($afterTurn, $this->hand);
 	}
 
 	/**
@@ -78,7 +87,7 @@ class PlayerData extends \common\base\PlayerData
 		$response = [
 			'health' => $this->getHealth(),
 			'mp' => $this->getPoints(),
-			'maxMp' => $this->getMaxPoint(),
+			'maxMp' => max($this->getPoints(), $this->getMaxPoint()),
 			'cards' => [],
 			'hand' => []
 		];
@@ -89,8 +98,8 @@ class PlayerData extends \common\base\PlayerData
 		array_walk($response['cards'], [$this, 'prepareCard']);
 		foreach ($this->hand as $card) {
 			$response['hand'][] = [
-				'card' => $card['card']->getAttributes(),
-				'data' => $card['data'],
+				'card' => $card->getAttributes(),
+				'data' => $card->getParams(),
 			];
 		}
 
@@ -102,10 +111,20 @@ class PlayerData extends \common\base\PlayerData
 	 */
 	protected function addToHand($card)
 	{
-		$this->hand[] = [
-			'card' => $card,
-			'data' => $card->getParams(),
-		];
+		$card->on(UnitCard::DEATH_EVENT, [$this, 'removeFromHand']);
+		$card->setIndex(count($this->hand));
+		$this->hand[] = $card;
+	}
+
+	/**
+	 * Remove card from hand
+	 * @param $event
+	 * @throws \Exception
+	 * @internal param $index
+	 */
+	public function removeFromHand($event) {
+		$this->getHandCard($event->index);
+		unset($this->hand[$event->index]);
 	}
 
 	/**

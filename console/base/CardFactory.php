@@ -47,8 +47,12 @@ class CardFactory {
 	 * Get cards
 	 * @param int $number
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function get($number = 1) {
+		if (!isset($this->ids[$this->card + $number - 1])) {
+			throw new \Exception('Illegal card index');
+		}
 		$data = [];
 		for ($i=1; $i<=$number; $i++) {
 			$this->card++;
@@ -88,18 +92,22 @@ class CardFactory {
 	/**
 	 * Get card
 	 * @param $c
-	 * @return BoostCard|DamageCard|UnitCard
+	 * @return Card
+	 * @throws \InvalidArgumentException
 	 */
 	protected static function getCard($c) {
 		switch ($c->type) {
-			case 1:
+			case DeckCard::TYPE_WARRIOR:
 				$card = new UnitCard();
 				break;
-			case 2:
+			case DeckCard::TYPE_DAMAGE:
 				$card = new DamageCard();
 				break;
-			default:
+			case DeckCard::TYPE_BOOST:
 				$card = new BoostCard();
+				break;
+			default:
+				throw new \InvalidArgumentException('Invalid card type');
 				break;
 		}
 		$card->setParams($c->getAttributes()['data']);

@@ -5,7 +5,10 @@ namespace console\base;
  * Class Card
  * @package console\base
  */
-class Card {
+class Card extends \yii\base\Component  {
+
+	const USAGE_IMMEDIATELY = 1;
+	const USAGE_UNIT_OR_HERO = 2;
 
 	public $id;
 	public $title;
@@ -26,8 +29,9 @@ class Card {
 
 	/**
 	 * Constructor
+	 * @param array $config
 	 */
-	public function __construct() {
+	public function __construct($config = []) {
 		$this->init();
 	}
 
@@ -53,14 +57,14 @@ class Card {
 		if (in_array($attribute, $this->getParamsList())) {
 			$this->{$attribute} = $value;
 		} else {
-			trigger_error('Card property does not exist');
+			trigger_error("Card property '{$attribute}' does not exist");
 		}
 	}
 
 	/**
 	 * Initialization function
 	 */
-	protected function init() {
+	public function init() {
 		// do init
 	}
 
@@ -101,6 +105,7 @@ class Card {
 		foreach (self::$attributes as $attribute) {
 			$data[$attribute] = $this->{$attribute};
 		}
+		$data['usage'] = (int)$this->getUsage();
 
 		return $data;
 	}
@@ -166,10 +171,18 @@ class Card {
 		return [
 			'card' => array_merge($this->getAttributes(), [
 				'id' => $this->getIndex(),
-				'text' => $this->getHtml(),
+				'text' => $this->getHtml()
 			]),
 			'data' => $this->getParams(),
 		];
+	}
+
+	/**
+	 * Card usage
+	 * @return int
+	 */
+	protected function getUsage() {
+		return static::USAGE_IMMEDIATELY;
 	}
 
 	/**
@@ -177,4 +190,9 @@ class Card {
 	 * @return string
 	 */
 	public function getHtml() {}
+
+	/**
+	 * Use card
+	 */
+	public function useCard() {}
 }
